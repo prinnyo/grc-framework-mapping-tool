@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InfoSec Controls Cross-Reference Tool | ISO 27001 → NIST CSF · SOC 2 · CIS v8 · PCI DSS</title>
+<meta name="description" content="Free interactive tool mapping all 93 ISO 27001:2022 Annex A controls to NIST CSF 2.0, SOC 2, CIS Controls v8, PCI DSS 4.0 and Cyber Essentials. Search, filter and cross-reference instantly.">
+<meta property="og:title" content="InfoSec Controls Cross-Reference Tool">
+<meta property="og:description" content="Map ISO 27001:2022 controls to NIST CSF, SOC 2, CIS, PCI DSS & Cyber Essentials — free interactive tool for GRC professionals.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #080e18; color: #e2e8f0; font-family: 'DM Sans', 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; }
+  ::selection { background: #00d4aa40; color: #fff; }
+  input::placeholder { color: #3a4a5a; }
+  input:focus { border-color: #00d4aa !important; box-shadow: 0 0 0 2px #00d4aa20; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .card-enter { animation: fadeIn 0.2s ease-out; }
+  .control-card { transition: border-color 0.15s, box-shadow 0.15s; }
+  .control-card:hover { border-color: #2a3a4a !important; box-shadow: 0 2px 12px #00000030; }
+  .expand-content { animation: fadeIn 0.2s ease-out; }
+  button { font-family: inherit; }
+  button:hover { filter: brightness(1.15); }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #080e18; }
+  ::-webkit-scrollbar-thumb { background: #1e2d3d; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script>
+const e = React.createElement;
+const { useState, useMemo, useCallback } = React;
+
+const CONTROLS = [
+  {id:"A.5.1",name:"Policies for information security",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-01, GV.PO-02",soc2:"CC1.1, CC5.2",cis:"CIS 1, CIS 2",pci:"Req 12",ce:"N/A",notes:"Foundation control - map policies to each framework requirement"},
+  {id:"A.5.2",name:"Information security roles and responsibilities",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-01, GV.RR-02",soc2:"CC1.3, CC1.4",cis:"CIS 1",pci:"Req 12",ce:"N/A",notes:"Ensure RACI exists for all security functions"},
+  {id:"A.5.3",name:"Segregation of duties",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC5.1, CC6.1",cis:"CIS 5, CIS 6",pci:"Req 7",ce:"Access Control",notes:"Map to access control matrices"},
+  {id:"A.5.4",name:"Management responsibilities",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-03",soc2:"CC1.4",cis:"CIS 14",pci:"Req 12",ce:"N/A",notes:"Link to training and awareness programmes"},
+  {id:"A.5.5",name:"Contact with authorities",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.CO",nistSub:"RS.CO-03",soc2:"CC7.4",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Include ICO, NCSC, sector regulators"},
+  {id:"A.5.6",name:"Contact with special interest groups",cat:"Organizational",nistFunc:"IDENTIFY",nistCat:"ID.IM",nistSub:"ID.IM-01",soc2:"CC7.4",cis:"CIS 17",pci:"Req 12",ce:"N/A",notes:"ISACs, CiSP, vendor communities"},
+  {id:"A.5.7",name:"Threat intelligence",cat:"Organizational",nistFunc:"IDENTIFY",nistCat:"ID.RA",nistSub:"ID.RA-02",soc2:"CC3.1, CC7.2",cis:"CIS 7, CIS 13",pci:"Req 6.1",ce:"N/A",notes:"Feed into risk assessments and SOC operations"},
+  {id:"A.5.8",name:"Information security in project management",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-02",soc2:"CC3.1",cis:"CIS 16",pci:"Req 6",ce:"N/A",notes:"Security gates at each project phase"},
+  {id:"A.5.9",name:"Inventory of information and other associated assets",cat:"Organizational",nistFunc:"IDENTIFY",nistCat:"ID.AM",nistSub:"ID.AM-01, ID.AM-02",soc2:"CC6.1",cis:"CIS 1, CIS 2",pci:"Req 2, Req 9",ce:"N/A",notes:"Hardware, software, data, cloud assets"},
+  {id:"A.5.10",name:"Acceptable use of information and other associated assets",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-01",soc2:"CC1.1, CC6.1",cis:"CIS 1",pci:"Req 12",ce:"N/A",notes:"AUP signed by all staff"},
+  {id:"A.5.11",name:"Return of assets",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.5",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Part of offboarding process"},
+  {id:"A.5.12",name:"Classification of information",cat:"Organizational",nistFunc:"IDENTIFY",nistCat:"ID.AM",nistSub:"ID.AM-05",soc2:"CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Public/Internal/Confidential/Restricted"},
+  {id:"A.5.13",name:"Labelling of information",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Automate with DLP where possible"},
+  {id:"A.5.14",name:"Information transfer",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 3, CIS 13",pci:"Req 4",ce:"N/A",notes:"Email, file sharing, API transfers"},
+  {id:"A.5.15",name:"Access control",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-01, PR.AA-03",soc2:"CC6.1, CC6.2, CC6.3",cis:"CIS 5, CIS 6",pci:"Req 7, Req 8",ce:"Access Control",notes:"Principle of least privilege"},
+  {id:"A.5.16",name:"Identity management",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-01, PR.AA-02",soc2:"CC6.1, CC6.2",cis:"CIS 5, CIS 6",pci:"Req 8",ce:"Access Control",notes:"Joiners, movers, leavers process"},
+  {id:"A.5.17",name:"Authentication information",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-02, PR.AA-03",soc2:"CC6.1",cis:"CIS 5, CIS 6",pci:"Req 8",ce:"Access Control",notes:"MFA, password policies, secrets management"},
+  {id:"A.5.18",name:"Access rights",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05, PR.AA-06",soc2:"CC6.2, CC6.3",cis:"CIS 5, CIS 6",pci:"Req 7, Req 8",ce:"Access Control",notes:"Quarterly access reviews recommended"},
+  {id:"A.5.19",name:"Information security in supplier relationships",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-01, GV.SC-03",soc2:"CC9.2",cis:"CIS 15",pci:"Req 12.8",ce:"N/A",notes:"Due diligence and contractual clauses"},
+  {id:"A.5.20",name:"Addressing info security within supplier agreements",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-04, GV.SC-05",soc2:"CC9.2",cis:"CIS 15",pci:"Req 12.8",ce:"N/A",notes:"Include right to audit, breach notification"},
+  {id:"A.5.21",name:"Managing info security in the ICT supply chain",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-06, GV.SC-07",soc2:"CC9.2",cis:"CIS 15, CIS 16",pci:"Req 12.8",ce:"N/A",notes:"SBOMs, vendor risk tiers"},
+  {id:"A.5.22",name:"Monitoring, review & change mgmt of supplier services",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-09, GV.SC-10",soc2:"CC9.2",cis:"CIS 15",pci:"Req 12.8",ce:"N/A",notes:"Annual supplier reviews minimum"},
+  {id:"A.5.23",name:"Information security for use of cloud services",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-07",soc2:"CC6.1, CC9.2",cis:"CIS 3, CIS 15",pci:"Req 12.8",ce:"N/A",notes:"CSA STAR, shared responsibility model"},
+  {id:"A.5.24",name:"Incident management planning and preparation",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.MA",nistSub:"RS.MA-01",soc2:"CC7.3, CC7.4",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Playbooks per incident type"},
+  {id:"A.5.25",name:"Assessment and decision on security events",cat:"Organizational",nistFunc:"DETECT",nistCat:"DE.AE",nistSub:"DE.AE-02, DE.AE-03",soc2:"CC7.2, CC7.3",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Triage and escalation criteria"},
+  {id:"A.5.26",name:"Response to information security incidents",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.MA",nistSub:"RS.MA-02, RS.MA-03",soc2:"CC7.4",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Containment, eradication, recovery"},
+  {id:"A.5.27",name:"Learning from information security incidents",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.MA",nistSub:"RS.MA-05",soc2:"CC7.5",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Post-incident reviews, lessons learned"},
+  {id:"A.5.28",name:"Collection of evidence",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.MA",nistSub:"RS.MA-04",soc2:"CC7.4",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Chain of custody, forensic readiness"},
+  {id:"A.5.29",name:"Information security during disruption",cat:"Organizational",nistFunc:"RECOVER",nistCat:"RC.RP",nistSub:"RC.RP-01",soc2:"A1.2",cis:"CIS 11, CIS 17",pci:"Req 9",ce:"N/A",notes:"BCP/DR with security considerations"},
+  {id:"A.5.30",name:"ICT readiness for business continuity",cat:"Organizational",nistFunc:"RECOVER",nistCat:"RC.RP",nistSub:"RC.RP-02, RC.RP-03",soc2:"A1.2, A1.3",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"RTO/RPO defined and tested"},
+  {id:"A.5.31",name:"Legal, statutory, regulatory and contractual requirements",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.OC",nistSub:"GV.OC-02, GV.OC-03",soc2:"CC2.2, CC2.3",cis:"CIS 1",pci:"Req 12",ce:"N/A",notes:"GDPR, DPA 2018, NIS2 etc"},
+  {id:"A.5.32",name:"Intellectual property rights",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.OC",nistSub:"GV.OC-03",soc2:"CC2.2",cis:"CIS 2",pci:"Req 12",ce:"N/A",notes:"Software licensing, IP ownership"},
+  {id:"A.5.33",name:"Protection of records",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Retention schedules, secure destruction"},
+  {id:"A.5.34",name:"Privacy and protection of PII",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"P1.1, CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"DPIA, privacy by design"},
+  {id:"A.5.35",name:"Independent review of information security",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.OV",nistSub:"GV.OV-01, GV.OV-02",soc2:"CC4.1",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Internal audit, external audits, pen tests"},
+  {id:"A.5.36",name:"Compliance with policies, rules and standards",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.OV",nistSub:"GV.OV-03",soc2:"CC4.2",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Gap assessments, compliance dashboards"},
+  {id:"A.5.37",name:"Documented operating procedures",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"CC7.1",cis:"CIS 4",pci:"Req 12",ce:"N/A",notes:"SOPs for security operations"},
+  {id:"A.6.1",name:"Screening",cat:"People",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-02",soc2:"CC1.4",cis:"CIS 14",pci:"Req 12.7",ce:"N/A",notes:"BS 7858, DBS checks"},
+  {id:"A.6.2",name:"Terms and conditions of employment",cat:"People",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-02",soc2:"CC1.4",cis:"CIS 14",pci:"Req 12",ce:"N/A",notes:"NDAs, acceptable use clauses"},
+  {id:"A.6.3",name:"Information security awareness, education and training",cat:"People",nistFunc:"PROTECT",nistCat:"PR.AT",nistSub:"PR.AT-01, PR.AT-02",soc2:"CC1.4, CC2.2",cis:"CIS 14",pci:"Req 12.6",ce:"N/A",notes:"Regular phishing sims, role-based training"},
+  {id:"A.6.4",name:"Disciplinary process",cat:"People",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-02",soc2:"CC1.5",cis:"CIS 14",pci:"Req 12",ce:"N/A",notes:"Proportionate and documented"},
+  {id:"A.6.5",name:"Responsibilities after termination or change",cat:"People",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.5",cis:"CIS 5",pci:"Req 8",ce:"Access Control",notes:"NDAs, knowledge transfer, access revocation"},
+  {id:"A.6.6",name:"Confidentiality or non-disclosure agreements",cat:"People",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-05",soc2:"CC9.2",cis:"CIS 14",pci:"Req 12",ce:"N/A",notes:"Staff, contractors, third parties"},
+  {id:"A.6.7",name:"Remote working",cat:"People",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 12",pci:"Req 12",ce:"Secure Config",notes:"VPN, endpoint protection, clean desk"},
+  {id:"A.6.8",name:"Information security event reporting",cat:"People",nistFunc:"DETECT",nistCat:"DE.AE",nistSub:"DE.AE-02",soc2:"CC7.2, CC7.3",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Clear reporting channels and timelines"},
+  {id:"A.7.1",name:"Physical security perimeters",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.4",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Secure zones, access control points"},
+  {id:"A.7.2",name:"Physical entry",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.4",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Badge access, visitor logs"},
+  {id:"A.7.3",name:"Securing offices, rooms and facilities",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.4",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Locks, alarms, CCTV"},
+  {id:"A.7.4",name:"Physical security monitoring",cat:"Physical",nistFunc:"DETECT",nistCat:"DE.CM",nistSub:"DE.CM-02",soc2:"CC6.4, CC7.2",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"CCTV, intrusion detection"},
+  {id:"A.7.5",name:"Protecting against physical and environmental threats",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-03",soc2:"A1.2",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"Fire suppression, flood protection, UPS"},
+  {id:"A.7.6",name:"Working in secure areas",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.4",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Supervised access, no phones policy"},
+  {id:"A.7.7",name:"Clear desk and clear screen",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1",cis:"CIS 3",pci:"Req 9",ce:"N/A",notes:"Screen lock, physical document security"},
+  {id:"A.7.8",name:"Equipment siting and protection",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-03",soc2:"A1.2",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Environmental controls, cable management"},
+  {id:"A.7.9",name:"Security of assets off-premises",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.6",cis:"CIS 1, CIS 12",pci:"Req 9",ce:"N/A",notes:"Laptops, mobile devices, removable media"},
+  {id:"A.7.10",name:"Storage media",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.5",cis:"CIS 3",pci:"Req 3, Req 9",ce:"N/A",notes:"Encryption, secure disposal, media tracking"},
+  {id:"A.7.11",name:"Supporting utilities",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-03",soc2:"A1.2",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"UPS, generator, dual feeds"},
+  {id:"A.7.12",name:"Cabling security",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-03",soc2:"A1.2",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Secure routing, fibre over copper"},
+  {id:"A.7.13",name:"Equipment maintenance",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"A1.1",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Scheduled maintenance, authorised personnel only"},
+  {id:"A.7.14",name:"Secure disposal or re-use of equipment",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.5",cis:"CIS 3",pci:"Req 3, Req 9",ce:"N/A",notes:"NIST 800-88 media sanitization"},
+  {id:"A.8.1",name:"User endpoint devices",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1, CC6.8",cis:"CIS 4, CIS 10",pci:"Req 5",ce:"Malware Protection",notes:"MDM, endpoint protection, hardening"},
+  {id:"A.8.2",name:"Privileged access rights",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC6.1, CC6.3",cis:"CIS 5, CIS 6",pci:"Req 7, Req 8",ce:"Access Control",notes:"PAM solutions, just-in-time access"},
+  {id:"A.8.3",name:"Information access restriction",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-03, PR.AA-05",soc2:"CC6.1, CC6.3",cis:"CIS 5, CIS 6",pci:"Req 7",ce:"Access Control",notes:"RBAC/ABAC implementation"},
+  {id:"A.8.4",name:"Access to source code",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC6.1",cis:"CIS 6, CIS 16",pci:"Req 6",ce:"N/A",notes:"Code repos, branch protection"},
+  {id:"A.8.5",name:"Secure authentication",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-02, PR.AA-03",soc2:"CC6.1",cis:"CIS 5, CIS 6",pci:"Req 8",ce:"Access Control",notes:"MFA, passwordless, SSO"},
+  {id:"A.8.6",name:"Capacity management",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-02",soc2:"A1.1",cis:"CIS 8",pci:"Req 12",ce:"N/A",notes:"Auto-scaling, capacity planning"},
+  {id:"A.8.7",name:"Protection against malware",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.8",cis:"CIS 10",pci:"Req 5",ce:"Malware Protection",notes:"EDR/XDR, application whitelisting"},
+  {id:"A.8.8",name:"Management of technical vulnerabilities",cat:"Technological",nistFunc:"IDENTIFY",nistCat:"ID.RA",nistSub:"ID.RA-01",soc2:"CC7.1",cis:"CIS 7",pci:"Req 6.1, Req 11",ce:"Security Updates",notes:"Vulnerability scanning, patch management"},
+  {id:"A.8.9",name:"Configuration management",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01, PR.PS-02",soc2:"CC6.1, CC7.1",cis:"CIS 4",pci:"Req 2",ce:"Secure Config",notes:"CIS benchmarks, hardened baselines"},
+  {id:"A.8.10",name:"Information deletion",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.5",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Retention policies, automated deletion"},
+  {id:"A.8.11",name:"Data masking",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Tokenisation, pseudonymisation"},
+  {id:"A.8.12",name:"Data leakage prevention",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 3, CIS 13",pci:"Req 3",ce:"N/A",notes:"DLP tools, email gateways"},
+  {id:"A.8.13",name:"Information backup",cat:"Technological",nistFunc:"RECOVER",nistCat:"RC.RP",nistSub:"RC.RP-02",soc2:"A1.2",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"3-2-1 rule, tested restores"},
+  {id:"A.8.14",name:"Redundancy of information processing facilities",cat:"Technological",nistFunc:"RECOVER",nistCat:"RC.RP",nistSub:"RC.RP-02, RC.RP-03",soc2:"A1.2",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"HA clusters, geo-redundancy"},
+  {id:"A.8.15",name:"Logging",cat:"Technological",nistFunc:"DETECT",nistCat:"DE.CM",nistSub:"DE.CM-01, DE.CM-09",soc2:"CC7.1, CC7.2",cis:"CIS 8",pci:"Req 10",ce:"N/A",notes:"SIEM, centralised logging, retention"},
+  {id:"A.8.16",name:"Monitoring activities",cat:"Technological",nistFunc:"DETECT",nistCat:"DE.CM",nistSub:"DE.CM-01, DE.CM-06",soc2:"CC7.2",cis:"CIS 8, CIS 13",pci:"Req 10, Req 11",ce:"N/A",notes:"SOC, SIEM, anomaly detection"},
+  {id:"A.8.17",name:"Clock synchronisation",cat:"Technological",nistFunc:"DETECT",nistCat:"DE.CM",nistSub:"DE.CM-01",soc2:"CC7.1",cis:"CIS 8",pci:"Req 10",ce:"N/A",notes:"NTP, GPS time sources"},
+  {id:"A.8.18",name:"Use of privileged utility programs",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC6.1",cis:"CIS 4, CIS 6",pci:"Req 7",ce:"N/A",notes:"Application whitelisting for admin tools"},
+  {id:"A.8.19",name:"Installation of software on operational systems",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"CC6.1, CC6.8",cis:"CIS 2, CIS 4",pci:"Req 6",ce:"N/A",notes:"Change management, approved software list"},
+  {id:"A.8.20",name:"Networks security",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 12, CIS 13",pci:"Req 1, Req 11",ce:"Firewalls",notes:"Segmentation, firewalls, IDS/IPS"},
+  {id:"A.8.21",name:"Security of network services",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 12, CIS 13",pci:"Req 1",ce:"Firewalls",notes:"SLAs, managed services security"},
+  {id:"A.8.22",name:"Segregation of networks",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-02",soc2:"CC6.6",cis:"CIS 12",pci:"Req 1",ce:"Firewalls",notes:"VLANs, microsegmentation, zero trust"},
+  {id:"A.8.23",name:"Web filtering",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-02",soc2:"CC6.6, CC6.8",cis:"CIS 9",pci:"Req 1",ce:"N/A",notes:"URL filtering, DNS filtering"},
+  {id:"A.8.24",name:"Use of cryptography",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.7",cis:"CIS 3",pci:"Req 3, Req 4",ce:"N/A",notes:"TLS 1.2+, AES-256, key management"},
+  {id:"A.8.25",name:"Secure development life cycle",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-06",soc2:"CC8.1",cis:"CIS 16",pci:"Req 6",ce:"N/A",notes:"SSDLC, code review, SAST/DAST"},
+  {id:"A.8.26",name:"Application security requirements",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-06",soc2:"CC8.1",cis:"CIS 16",pci:"Req 6",ce:"N/A",notes:"OWASP Top 10, threat modelling"},
+  {id:"A.8.27",name:"Secure system architecture and engineering principles",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01, PR.PS-06",soc2:"CC8.1",cis:"CIS 4, CIS 16",pci:"Req 2, Req 6",ce:"Secure Config",notes:"Defence in depth, zero trust"},
+  {id:"A.8.28",name:"Secure coding",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-06",soc2:"CC8.1",cis:"CIS 16",pci:"Req 6",ce:"N/A",notes:"OWASP, input validation, output encoding"},
+  {id:"A.8.29",name:"Security testing in development and acceptance",cat:"Technological",nistFunc:"IDENTIFY",nistCat:"ID.RA",nistSub:"ID.RA-01",soc2:"CC8.1",cis:"CIS 16",pci:"Req 6, Req 11",ce:"N/A",notes:"SAST, DAST, pen testing, UAT"},
+  {id:"A.8.30",name:"Outsourced development",cat:"Technological",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-05, GV.SC-07",soc2:"CC9.2",cis:"CIS 15, CIS 16",pci:"Req 6",ce:"N/A",notes:"Contractual security requirements"},
+  {id:"A.8.31",name:"Separation of dev, test and production environments",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1, CC8.1",cis:"CIS 4, CIS 16",pci:"Req 6",ce:"N/A",notes:"Env separation, no prod data in test"},
+  {id:"A.8.32",name:"Change management",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"CC8.1",cis:"CIS 4",pci:"Req 6.5",ce:"N/A",notes:"CAB, impact assessment, rollback plans"},
+  {id:"A.8.33",name:"Test information",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1",cis:"CIS 3, CIS 16",pci:"Req 6",ce:"N/A",notes:"Data masking for test data"},
+  {id:"A.8.34",name:"Protection of info systems during audit testing",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC4.1",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Minimise business impact of audits"},
+];
+
+const FC = {GOVERN:"#F59E0B",IDENTIFY:"#10B981",PROTECT:"#3B82F6",DETECT:"#8B5CF6",RESPOND:"#EF4444",RECOVER:"#06B6D4"};
+const CC = {Organizational:"#3B82F6",People:"#10B981",Physical:"#F59E0B",Technological:"#8B5CF6"};
+
+function Tag({text,color}){return e("span",{style:{display:"inline-block",padding:"2px 8px",borderRadius:4,fontSize:11,fontWeight:600,background:color+"18",color,border:"1px solid "+color+"30",marginRight:4,marginBottom:2,whiteSpace:"nowrap"}},text)}
+
+function ControlCard({c,expanded,onToggle}){
+  return e("div",{className:"control-card",onClick:onToggle,style:{background:"#0d1520",border:"1px solid #1e2d3d",borderRadius:8,padding:"14px 18px",cursor:"pointer",borderLeft:"3px solid "+FC[c.nistFunc]}},
+    e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12}},
+      e("div",{style:{flex:1,minWidth:0}},
+        e("div",{style:{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:6}},
+          e("span",{style:{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:"#00d4aa",fontSize:14}},c.id),
+          e(Tag,{text:c.cat,color:CC[c.cat]}),
+          e(Tag,{text:c.nistFunc,color:FC[c.nistFunc]})
+        ),
+        e("div",{style:{color:"#e2e8f0",fontSize:14,fontWeight:500,lineHeight:1.4}},c.name)
+      ),
+      e("span",{style:{color:"#4a5568",fontSize:18,flexShrink:0,marginTop:2}},expanded?"\u2212":"+")
+    ),
+    expanded && e("div",{className:"expand-content",style:{marginTop:14,paddingTop:14,borderTop:"1px solid #1e2d3d"}},
+      e("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px 24px"}},
+        [["NIST CSF 2.0",c.nistCat+" \u2192 "+c.nistSub],["SOC 2 TSC",c.soc2],["CIS Controls v8",c.cis],["PCI DSS 4.0",c.pci],["Cyber Essentials",c.ce]].map(function(pair){
+          return e("div",{key:pair[0]},
+            e("div",{style:{fontSize:10,fontWeight:700,color:"#4a5568",textTransform:"uppercase",letterSpacing:1,marginBottom:2}},pair[0]),
+            e("div",{style:{fontSize:13,color:pair[1]==="N/A"?"#4a5568":"#a0aec0",fontFamily:"'JetBrains Mono',monospace"}},pair[1])
+          )
+        })
+      ),
+      e("div",{style:{marginTop:12,padding:"8px 12px",background:"#0a1929",borderRadius:6,border:"1px solid #1a2a3a"}},
+        e("div",{style:{fontSize:10,fontWeight:700,color:"#00d4aa",textTransform:"uppercase",letterSpacing:1,marginBottom:2}},"Implementation Guidance"),
+        e("div",{style:{fontSize:13,color:"#a0aec0",lineHeight:1.5}},c.notes)
+      )
+    )
+  )
+}
+
+function Pill({label,active,onClick,color}){
+  return e("button",{onClick:onClick,style:{padding:"5px 14px",borderRadius:20,border:active?"1px solid "+(color||"#00d4aa"):"1px solid #1e2d3d",background:active?(color||"#00d4aa")+"18":"transparent",color:active?(color||"#00d4aa"):"#4a5568",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all 0.15s",whiteSpace:"nowrap"}},label)
+}
+
+function App(){
+  var _s=useState(""),search=_s[0],setSearch=_s[1];
+  var _c=useState("All"),catFilter=_c[0],setCatFilter=_c[1];
+  var _f=useState("All"),funcFilter=_f[0],setFuncFilter=_f[1];
+  var _e=useState(null),expanded=_e[0],setExpanded=_e[1];
+
+  var filtered=useMemo(function(){
+    var q=search.toLowerCase();
+    return CONTROLS.filter(function(c){
+      if(catFilter!=="All"&&c.cat!==catFilter)return false;
+      if(funcFilter!=="All"&&c.nistFunc!==funcFilter)return false;
+      if(!q)return true;
+      return[c.id,c.name,c.nistCat,c.nistSub,c.soc2,c.cis,c.pci,c.ce,c.notes].some(function(v){return v.toLowerCase().includes(q)});
+    });
+  },[search,catFilter,funcFilter]);
+
+  var stats=useMemo(function(){
+    return{total:filtered.length,funcs:Object.keys(FC).map(function(f){return{name:f,count:filtered.filter(function(c){return c.nistFunc===f}).length}})};
+  },[filtered]);
+
+  return e("div",{style:{minHeight:"100vh",background:"#080e18",color:"#e2e8f0",fontFamily:"'DM Sans','Segoe UI',sans-serif"}},
+    e("div",{style:{maxWidth:720,margin:"0 auto",padding:"24px 16px"}},
+      e("div",{style:{marginBottom:28}},
+        e("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:4}},
+          e("span",{style:{fontSize:22}},"\uD83D\uDEE1"),
+          e("h1",{style:{fontSize:22,fontWeight:800,color:"#fff",margin:0}},"InfoSec Controls Cross-Reference")
+        ),
+        e("p",{style:{color:"#4a5568",fontSize:13,margin:"4px 0 0"}},"ISO 27001:2022 \u2192 NIST CSF 2.0 \u00B7 SOC 2 \u00B7 CIS v8 \u00B7 PCI DSS \u00B7 Cyber Essentials")
+      ),
+      e("input",{type:"text",value:search,onChange:function(ev){setSearch(ev.target.value)},placeholder:"Search controls, frameworks, keywords (e.g. MFA, CC6.1, CIS 5, access)...",style:{width:"100%",padding:"12px 16px",borderRadius:8,border:"1px solid #1e2d3d",background:"#0d1520",color:"#e2e8f0",fontSize:14,outline:"none",boxSizing:"border-box",marginBottom:14,fontFamily:"inherit"}}),
+      e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}},
+        e("span",{style:{fontSize:11,color:"#4a5568",fontWeight:600,alignSelf:"center",marginRight:4}},"ISO Category:"),
+        ["All","Organizational","People","Physical","Technological"].map(function(c){return e(Pill,{key:c,label:c,active:catFilter===c,onClick:function(){setCatFilter(c)},color:CC[c]})})
+      ),
+      e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:18}},
+        e("span",{style:{fontSize:11,color:"#4a5568",fontWeight:600,alignSelf:"center",marginRight:4}},"NIST Function:"),
+        ["All","GOVERN","IDENTIFY","PROTECT","DETECT","RESPOND","RECOVER"].map(function(f){return e(Pill,{key:f,label:f,active:funcFilter===f,onClick:function(){setFuncFilter(f)},color:FC[f]})})
+      ),
+      e("div",{style:{display:"flex",gap:8,marginBottom:18,flexWrap:"wrap"}},
+        stats.funcs.filter(function(f){return f.count>0}).map(function(f){
+          return e("div",{key:f.name,style:{padding:"6px 12px",borderRadius:6,background:FC[f.name]+"12",border:"1px solid "+FC[f.name]+"25",textAlign:"center"}},
+            e("div",{style:{fontSize:18,fontWeight:800,color:FC[f.name]}},f.count),
+            e("div",{style:{fontSize:9,fontWeight:700,color:FC[f.name],opacity:0.7,textTransform:"uppercase",letterSpacing:0.5}},f.name)
+          )
+        }),
+        e("div",{style:{padding:"6px 12px",borderRadius:6,background:"#00d4aa12",border:"1px solid #00d4aa25",textAlign:"center"}},
+          e("div",{style:{fontSize:18,fontWeight:800,color:"#00d4aa"}},stats.total),
+          e("div",{style:{fontSize:9,fontWeight:700,color:"#00d4aa",opacity:0.7,textTransform:"uppercase",letterSpacing:0.5}},"Total")
+        )
+      ),
+      e("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+        filtered.length===0&&e("div",{style:{textAlign:"center",padding:40,color:"#4a5568"}},"No controls match your search."),
+        filtered.map(function(c){return e(ControlCard,{key:c.id,c:c,expanded:expanded===c.id,onToggle:function(){setExpanded(expanded===c.id?null:c.id)}})})
+      ),
+      e("div",{style:{marginTop:32,paddingTop:16,borderTop:"1px solid #1e2d3d",textAlign:"center",color:"#2d3748",fontSize:11}},
+        "ISO 27001:2022 \u00B7 NIST CSF 2.0 \u00B7 SOC 2 2022 \u00B7 CIS v8 \u00B7 PCI DSS 4.0 \u00B7 Cyber Essentials \u00B7 Built by @in_herspace"
+      )
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(e(App));
+</script>
+</body>
+</html>
