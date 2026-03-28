@@ -6,33 +6,30 @@
 <title>InfoSec Controls Cross-Reference Tool | ISO 27001 → NIST CSF · SOC 2 · CIS v8 · PCI DSS</title>
 <meta name="description" content="Free interactive tool mapping all 93 ISO 27001:2022 Annex A controls to NIST CSF 2.0, SOC 2, CIS Controls v8, PCI DSS 4.0 and Cyber Essentials. Search, filter and cross-reference instantly.">
 <meta property="og:title" content="InfoSec Controls Cross-Reference Tool">
-<meta property="og:description" content="Map ISO 27001:2022 controls to NIST CSF, SOC 2, CIS, PCI DSS & Cyber Essentials — free interactive tool for GRC professionals.">
+<meta property="og:description" content="Map ISO 27001:2022 controls to NIST CSF, SOC 2, CIS, PCI DSS and Cyber Essentials — free interactive tool for GRC professionals.">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #080e18; color: #e2e8f0; font-family: 'DM Sans', 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; }
-  ::selection { background: #00d4aa40; color: #fff; }
-  input::placeholder { color: #3a4a5a; }
-  input:focus { border-color: #00d4aa !important; box-shadow: 0 0 0 2px #00d4aa20; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-  .card-enter { animation: fadeIn 0.2s ease-out; }
-  .control-card { transition: border-color 0.15s, box-shadow 0.15s; }
-  .control-card:hover { border-color: #2a3a4a !important; box-shadow: 0 2px 12px #00000030; }
-  .expand-content { animation: fadeIn 0.2s ease-out; }
-  .autocomplete-dropdown { animation: slideDown 0.2s ease-out; }
-  .tutorial-modal { animation: fadeIn 0.3s ease-out; }
-  .example-search { transition: all 0.15s; }
-  .example-search:hover { background: #1e2d3d !important; transform: translateY(-1px); }
-  button { font-family: inherit; }
-  button:hover { filter: brightness(1.15); }
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #080e18; }
-  ::-webkit-scrollbar-thumb { background: #1e2d3d; border-radius: 3px; }
-  .pulse { animation: pulse 2s infinite; }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:#080e18;color:#e2e8f0;font-family:'DM Sans','Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+  ::selection{background:#00d4aa40;color:#fff}
+  input::placeholder{color:#3a4a5a}
+  input:focus{border-color:#00d4aa !important;box-shadow:0 0 0 2px #00d4aa20}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+  .control-card{transition:border-color .15s,box-shadow .15s}
+  .control-card:hover{border-color:#2a3a4a !important;box-shadow:0 2px 12px #00000030}
+  .expand-content{animation:fadeIn .2s ease-out}
+  .autocomplete-dropdown{animation:slideDown .2s ease-out}
+  .tutorial-modal{animation:fadeIn .3s ease-out}
+  .example-search{transition:all .15s}
+  .example-search:hover{background:#1e2d3d !important;transform:translateY(-1px)}
+  button{font-family:inherit}
+  button:hover{filter:brightness(1.15)}
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:#080e18}
+  ::-webkit-scrollbar-thumb{background:#1e2d3d;border-radius:3px}
 </style>
 </head>
 <body>
@@ -40,429 +37,282 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script>
-const e = React.createElement;
-const { useState, useMemo, useCallback, useEffect } = React;
+var e=React.createElement,useState=React.useState,useMemo=React.useMemo,useCallback=React.useCallback,useEffect=React.useEffect;
 
-const CONTROLS = [
-  {id:"A.5.1",name:"Policies for information security",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-01, GV.PO-02",soc2:"CC1.1, CC5.2",cis:"CIS 1, CIS 2",pci:"Req 12",ce:"N/A",notes:"Foundation control - map policies to each framework requirement"},
-  {id:"A.5.2",name:"Information security roles and responsibilities",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-01, GV.RR-02",soc2:"CC1.3, CC1.4",cis:"CIS 1",pci:"Req 12",ce:"N/A",notes:"Ensure RACI exists for all security functions"},
-  {id:"A.5.3",name:"Segregation of duties",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC5.1, CC6.1",cis:"CIS 5, CIS 6",pci:"Req 7",ce:"Access Control",notes:"Map to access control matrices"},
-  {id:"A.5.4",name:"Management responsibilities",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-03",soc2:"CC1.4",cis:"CIS 14",pci:"Req 12",ce:"N/A",notes:"Link to training and awareness programmes"},
-  {id:"A.5.5",name:"Contact with authorities",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.CO",nistSub:"RS.CO-03",soc2:"CC7.4",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Include ICO, NCSC, sector regulators"},
-  {id:"A.5.6",name:"Contact with special interest groups",cat:"Organizational",nistFunc:"IDENTIFY",nistCat:"ID.IM",nistSub:"ID.IM-01",soc2:"CC7.4",cis:"CIS 17",pci:"Req 12",ce:"N/A",notes:"ISACs, CiSP, vendor communities"},
-  {id:"A.5.7",name:"Threat intelligence",cat:"Organizational",nistFunc:"IDENTIFY",nistCat:"ID.RA",nistSub:"ID.RA-02",soc2:"CC3.1, CC7.2",cis:"CIS 7, CIS 13",pci:"Req 6.1",ce:"N/A",notes:"Feed into risk assessments and SOC operations"},
-  {id:"A.5.8",name:"Information security in project management",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-02",soc2:"CC3.1",cis:"CIS 16",pci:"Req 6",ce:"N/A",notes:"Security gates at each project phase"},
-  {id:"A.5.9",name:"Inventory of information and other associated assets",cat:"Organizational",nistFunc:"IDENTIFY",nistCat:"ID.AM",nistSub:"ID.AM-01, ID.AM-02",soc2:"CC6.1",cis:"CIS 1, CIS 2",pci:"Req 2, Req 9",ce:"N/A",notes:"Hardware, software, data, cloud assets"},
-  {id:"A.5.10",name:"Acceptable use of information and other associated assets",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-01",soc2:"CC1.1, CC6.1",cis:"CIS 1",pci:"Req 12",ce:"N/A",notes:"AUP signed by all staff"},
-  {id:"A.5.11",name:"Return of assets",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.5",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Part of offboarding process"},
-  {id:"A.5.12",name:"Classification of information",cat:"Organizational",nistFunc:"IDENTIFY",nistCat:"ID.AM",nistSub:"ID.AM-05",soc2:"CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Public/Internal/Confidential/Restricted"},
-  {id:"A.5.13",name:"Labelling of information",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Automate with DLP where possible"},
-  {id:"A.5.14",name:"Information transfer",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 3, CIS 13",pci:"Req 4",ce:"N/A",notes:"Email, file sharing, API transfers"},
-  {id:"A.5.15",name:"Access control",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-01, PR.AA-03",soc2:"CC6.1, CC6.2, CC6.3",cis:"CIS 5, CIS 6",pci:"Req 7, Req 8",ce:"Access Control",notes:"Principle of least privilege"},
-  {id:"A.5.16",name:"Identity management",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-01, PR.AA-02",soc2:"CC6.1, CC6.2",cis:"CIS 5, CIS 6",pci:"Req 8",ce:"Access Control",notes:"Joiners, movers, leavers process"},
-  {id:"A.5.17",name:"Authentication information",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-02, PR.AA-03",soc2:"CC6.1",cis:"CIS 5, CIS 6",pci:"Req 8",ce:"Access Control",notes:"MFA, password policies, secrets management"},
-  {id:"A.5.18",name:"Access rights",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05, PR.AA-06",soc2:"CC6.2, CC6.3",cis:"CIS 5, CIS 6",pci:"Req 7, Req 8",ce:"Access Control",notes:"Quarterly access reviews recommended"},
-  {id:"A.5.19",name:"Information security in supplier relationships",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-01, GV.SC-03",soc2:"CC9.2",cis:"CIS 15",pci:"Req 12.8",ce:"N/A",notes:"Due diligence and contractual clauses"},
-  {id:"A.5.20",name:"Addressing info security within supplier agreements",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-04, GV.SC-05",soc2:"CC9.2",cis:"CIS 15",pci:"Req 12.8",ce:"N/A",notes:"Include right to audit, breach notification"},
-  {id:"A.5.21",name:"Managing info security in the ICT supply chain",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-06, GV.SC-07",soc2:"CC9.2",cis:"CIS 15, CIS 16",pci:"Req 12.8",ce:"N/A",notes:"SBOMs, vendor risk tiers"},
-  {id:"A.5.22",name:"Monitoring, review & change mgmt of supplier services",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-09, GV.SC-10",soc2:"CC9.2",cis:"CIS 15",pci:"Req 12.8",ce:"N/A",notes:"Annual supplier reviews minimum"},
-  {id:"A.5.23",name:"Information security for use of cloud services",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-07",soc2:"CC6.1, CC9.2",cis:"CIS 3, CIS 15",pci:"Req 12.8",ce:"N/A",notes:"CSA STAR, shared responsibility model"},
-  {id:"A.5.24",name:"Incident management planning and preparation",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.MA",nistSub:"RS.MA-01",soc2:"CC7.3, CC7.4",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Playbooks per incident type"},
-  {id:"A.5.25",name:"Assessment and decision on security events",cat:"Organizational",nistFunc:"DETECT",nistCat:"DE.AE",nistSub:"DE.AE-02, DE.AE-03",soc2:"CC7.2, CC7.3",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Triage and escalation criteria"},
-  {id:"A.5.26",name:"Response to information security incidents",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.MA",nistSub:"RS.MA-02, RS.MA-03",soc2:"CC7.4",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Containment, eradication, recovery"},
-  {id:"A.5.27",name:"Learning from information security incidents",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.MA",nistSub:"RS.MA-05",soc2:"CC7.5",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Post-incident reviews, lessons learned"},
-  {id:"A.5.28",name:"Collection of evidence",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.MA",nistSub:"RS.MA-04",soc2:"CC7.4",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Chain of custody, forensic readiness"},
-  {id:"A.5.29",name:"Information security during disruption",cat:"Organizational",nistFunc:"RECOVER",nistCat:"RC.RP",nistSub:"RC.RP-01",soc2:"A1.2",cis:"CIS 11, CIS 17",pci:"Req 9",ce:"N/A",notes:"BCP/DR with security considerations"},
-  {id:"A.5.30",name:"ICT readiness for business continuity",cat:"Organizational",nistFunc:"RECOVER",nistCat:"RC.RP",nistSub:"RC.RP-02, RC.RP-03",soc2:"A1.2, A1.3",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"RTO/RPO defined and tested"},
-  {id:"A.5.31",name:"Legal, statutory, regulatory and contractual requirements",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.OC",nistSub:"GV.OC-02, GV.OC-03",soc2:"CC2.2, CC2.3",cis:"CIS 1",pci:"Req 12",ce:"N/A",notes:"GDPR, DPA 2018, NIS2 etc"},
-  {id:"A.5.32",name:"Intellectual property rights",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.OC",nistSub:"GV.OC-03",soc2:"CC2.2",cis:"CIS 2",pci:"Req 12",ce:"N/A",notes:"Software licensing, IP ownership"},
-  {id:"A.5.33",name:"Protection of records",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Retention schedules, secure destruction"},
-  {id:"A.5.34",name:"Privacy and protection of PII",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"P1.1, CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"DPIA, privacy by design"},
-  {id:"A.5.35",name:"Independent review of information security",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.OV",nistSub:"GV.OV-01, GV.OV-02",soc2:"CC4.1",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Internal audit, external audits, pen tests"},
-  {id:"A.5.36",name:"Compliance with policies, rules and standards",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.OV",nistSub:"GV.OV-03",soc2:"CC4.2",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Gap assessments, compliance dashboards"},
-  {id:"A.5.37",name:"Documented operating procedures",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"CC7.1",cis:"CIS 4",pci:"Req 12",ce:"N/A",notes:"SOPs for security operations"},
-  {id:"A.6.1",name:"Screening",cat:"People",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-02",soc2:"CC1.4",cis:"CIS 14",pci:"Req 12.7",ce:"N/A",notes:"BS 7858, DBS checks"},
-  {id:"A.6.2",name:"Terms and conditions of employment",cat:"People",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-02",soc2:"CC1.4",cis:"CIS 14",pci:"Req 12",ce:"N/A",notes:"NDAs, acceptable use clauses"},
-  {id:"A.6.3",name:"Information security awareness, education and training",cat:"People",nistFunc:"PROTECT",nistCat:"PR.AT",nistSub:"PR.AT-01, PR.AT-02",soc2:"CC1.4, CC2.2",cis:"CIS 14",pci:"Req 12.6",ce:"N/A",notes:"Regular phishing sims, role-based training"},
-  {id:"A.6.4",name:"Disciplinary process",cat:"People",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-02",soc2:"CC1.5",cis:"CIS 14",pci:"Req 12",ce:"N/A",notes:"Proportionate and documented"},
-  {id:"A.6.5",name:"Responsibilities after termination or change",cat:"People",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.5",cis:"CIS 5",pci:"Req 8",ce:"Access Control",notes:"NDAs, knowledge transfer, access revocation"},
-  {id:"A.6.6",name:"Confidentiality or non-disclosure agreements",cat:"People",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-05",soc2:"CC9.2",cis:"CIS 14",pci:"Req 12",ce:"N/A",notes:"Staff, contractors, third parties"},
-  {id:"A.6.7",name:"Remote working",cat:"People",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 12",pci:"Req 12",ce:"Secure Config",notes:"VPN, endpoint protection, clean desk"},
-  {id:"A.6.8",name:"Information security event reporting",cat:"People",nistFunc:"DETECT",nistCat:"DE.AE",nistSub:"DE.AE-02",soc2:"CC7.2, CC7.3",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Clear reporting channels and timelines"},
-  {id:"A.7.1",name:"Physical security perimeters",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.4",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Secure zones, access control points"},
-  {id:"A.7.2",name:"Physical entry",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.4",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Badge access, visitor logs"},
-  {id:"A.7.3",name:"Securing offices, rooms and facilities",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.4",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Locks, alarms, CCTV"},
-  {id:"A.7.4",name:"Physical security monitoring",cat:"Physical",nistFunc:"DETECT",nistCat:"DE.CM",nistSub:"DE.CM-02",soc2:"CC6.4, CC7.2",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"CCTV, intrusion detection"},
-  {id:"A.7.5",name:"Protecting against physical and environmental threats",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-03",soc2:"A1.2",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"Fire suppression, flood protection, UPS"},
-  {id:"A.7.6",name:"Working in secure areas",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.4",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Supervised access, no phones policy"},
-  {id:"A.7.7",name:"Clear desk and clear screen",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1",cis:"CIS 3",pci:"Req 9",ce:"N/A",notes:"Screen lock, physical document security"},
-  {id:"A.7.8",name:"Equipment siting and protection",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-03",soc2:"A1.2",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Environmental controls, cable management"},
-  {id:"A.7.9",name:"Security of assets off-premises",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.6",cis:"CIS 1, CIS 12",pci:"Req 9",ce:"N/A",notes:"Laptops, mobile devices, removable media"},
-  {id:"A.7.10",name:"Storage media",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.5",cis:"CIS 3",pci:"Req 3, Req 9",ce:"N/A",notes:"Encryption, secure disposal, media tracking"},
-  {id:"A.7.11",name:"Supporting utilities",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-03",soc2:"A1.2",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"UPS, generator, dual feeds"},
-  {id:"A.7.12",name:"Cabling security",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-03",soc2:"A1.2",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Secure routing, fibre over copper"},
-  {id:"A.7.13",name:"Equipment maintenance",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"A1.1",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Scheduled maintenance, authorised personnel only"},
-  {id:"A.7.14",name:"Secure disposal or re-use of equipment",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.5",cis:"CIS 3",pci:"Req 3, Req 9",ce:"N/A",notes:"NIST 800-88 media sanitization"},
-  {id:"A.8.1",name:"User endpoint devices",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1, CC6.8",cis:"CIS 4, CIS 10",pci:"Req 5",ce:"Malware Protection",notes:"MDM, endpoint protection, hardening"},
-  {id:"A.8.2",name:"Privileged access rights",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC6.1, CC6.3",cis:"CIS 5, CIS 6",pci:"Req 7, Req 8",ce:"Access Control",notes:"PAM solutions, just-in-time access"},
-  {id:"A.8.3",name:"Information access restriction",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-03, PR.AA-05",soc2:"CC6.1, CC6.3",cis:"CIS 5, CIS 6",pci:"Req 7",ce:"Access Control",notes:"RBAC/ABAC implementation"},
-  {id:"A.8.4",name:"Access to source code",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC6.1",cis:"CIS 6, CIS 16",pci:"Req 6",ce:"N/A",notes:"Code repos, branch protection"},
-  {id:"A.8.5",name:"Secure authentication",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-02, PR.AA-03",soc2:"CC6.1",cis:"CIS 5, CIS 6",pci:"Req 8",ce:"Access Control",notes:"MFA, passwordless, SSO"},
-  {id:"A.8.6",name:"Capacity management",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-02",soc2:"A1.1",cis:"CIS 8",pci:"Req 12",ce:"N/A",notes:"Auto-scaling, capacity planning"},
-  {id:"A.8.7",name:"Protection against malware",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.8",cis:"CIS 10",pci:"Req 5",ce:"Malware Protection",notes:"EDR/XDR, application whitelisting"},
-  {id:"A.8.8",name:"Management of technical vulnerabilities",cat:"Technological",nistFunc:"IDENTIFY",nistCat:"ID.RA",nistSub:"ID.RA-01",soc2:"CC7.1",cis:"CIS 7",pci:"Req 6.1, Req 11",ce:"Security Updates",notes:"Vulnerability scanning, patch management"},
-  {id:"A.8.9",name:"Configuration management",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01, PR.PS-02",soc2:"CC6.1, CC7.1",cis:"CIS 4",pci:"Req 2",ce:"Secure Config",notes:"CIS benchmarks, hardened baselines"},
-  {id:"A.8.10",name:"Information deletion",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.5",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Retention policies, automated deletion"},
-  {id:"A.8.11",name:"Data masking",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Tokenisation, pseudonymisation"},
-  {id:"A.8.12",name:"Data leakage prevention",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 3, CIS 13",pci:"Req 3",ce:"N/A",notes:"DLP tools, email gateways"},
-  {id:"A.8.13",name:"Information backup",cat:"Technological",nistFunc:"RECOVER",nistCat:"RC.RP",nistSub:"RC.RP-02",soc2:"A1.2",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"3-2-1 rule, tested restores"},
-  {id:"A.8.14",name:"Redundancy of information processing facilities",cat:"Technological",nistFunc:"RECOVER",nistCat:"RC.RP",nistSub:"RC.RP-02, RC.RP-03",soc2:"A1.2",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"HA clusters, geo-redundancy"},
-  {id:"A.8.15",name:"Logging",cat:"Technological",nistFunc:"DETECT",nistCat:"DE.CM",nistSub:"DE.CM-01, DE.CM-09",soc2:"CC7.1, CC7.2",cis:"CIS 8",pci:"Req 10",ce:"N/A",notes:"SIEM, centralised logging, retention"},
-  {id:"A.8.16",name:"Monitoring activities",cat:"Technological",nistFunc:"DETECT",nistCat:"DE.CM",nistSub:"DE.CM-01, DE.CM-06",soc2:"CC7.2",cis:"CIS 8, CIS 13",pci:"Req 10, Req 11",ce:"N/A",notes:"SOC, SIEM, anomaly detection"},
-  {id:"A.8.17",name:"Clock synchronisation",cat:"Technological",nistFunc:"DETECT",nistCat:"DE.CM",nistSub:"DE.CM-01",soc2:"CC7.1",cis:"CIS 8",pci:"Req 10",ce:"N/A",notes:"NTP, GPS time sources"},
-  {id:"A.8.18",name:"Use of privileged utility programs",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC6.1",cis:"CIS 4, CIS 6",pci:"Req 7",ce:"N/A",notes:"Application whitelisting for admin tools"},
-  {id:"A.8.19",name:"Installation of software on operational systems",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"CC6.1, CC6.8",cis:"CIS 2, CIS 4",pci:"Req 6",ce:"N/A",notes:"Change management, approved software list"},
-  {id:"A.8.20",name:"Networks security",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 12, CIS 13",pci:"Req 1, Req 11",ce:"Firewalls",notes:"Segmentation, firewalls, IDS/IPS"},
-  {id:"A.8.21",name:"Security of network services",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 12, CIS 13",pci:"Req 1",ce:"Firewalls",notes:"SLAs, managed services security"},
-  {id:"A.8.22",name:"Segregation of networks",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-02",soc2:"CC6.6",cis:"CIS 12",pci:"Req 1",ce:"Firewalls",notes:"VLANs, microsegmentation, zero trust"},
-  {id:"A.8.23",name:"Web filtering",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-02",soc2:"CC6.6, CC6.8",cis:"CIS 9",pci:"Req 1",ce:"N/A",notes:"URL filtering, DNS filtering"},
-  {id:"A.8.24",name:"Use of cryptography",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.7",cis:"CIS 3",pci:"Req 3, Req 4",ce:"N/A",notes:"TLS 1.2+, AES-256, key management"},
-  {id:"A.8.25",name:"Secure development life cycle",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-06",soc2:"CC8.1",cis:"CIS 16",pci:"Req 6",ce:"N/A",notes:"SSDLC, code review, SAST/DAST"},
-  {id:"A.8.26",name:"Application security requirements",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-06",soc2:"CC8.1",cis:"CIS 16",pci:"Req 6",ce:"N/A",notes:"OWASP Top 10, threat modelling"},
-  {id:"A.8.27",name:"Secure system architecture and engineering principles",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01, PR.PS-06",soc2:"CC8.1",cis:"CIS 4, CIS 16",pci:"Req 2, Req 6",ce:"Secure Config",notes:"Defence in depth, zero trust"},
-  {id:"A.8.28",name:"Secure coding",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-06",soc2:"CC8.1",cis:"CIS 16",pci:"Req 6",ce:"N/A",notes:"OWASP, input validation, output encoding"},
-  {id:"A.8.29",name:"Security testing in development and acceptance",cat:"Technological",nistFunc:"IDENTIFY",nistCat:"ID.RA",nistSub:"ID.RA-01",soc2:"CC8.1",cis:"CIS 16",pci:"Req 6, Req 11",ce:"N/A",notes:"SAST, DAST, pen testing, UAT"},
-  {id:"A.8.30",name:"Outsourced development",cat:"Technological",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-05, GV.SC-07",soc2:"CC9.2",cis:"CIS 15, CIS 16",pci:"Req 6",ce:"N/A",notes:"Contractual security requirements"},
-  {id:"A.8.31",name:"Separation of dev, test and production environments",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1, CC8.1",cis:"CIS 4, CIS 16",pci:"Req 6",ce:"N/A",notes:"Env separation, no prod data in test"},
-  {id:"A.8.32",name:"Change management",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"CC8.1",cis:"CIS 4",pci:"Req 6.5",ce:"N/A",notes:"CAB, impact assessment, rollback plans"},
-  {id:"A.8.33",name:"Test information",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1",cis:"CIS 3, CIS 16",pci:"Req 6",ce:"N/A",notes:"Data masking for test data"},
-  {id:"A.8.34",name:"Protection of info systems during audit testing",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC4.1",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Minimise business impact of audits"},
+var NIST_DESC={"GV.PO-01":"A policy for managing cybersecurity risks is established based on organisational context, cybersecurity strategy, and priorities","GV.PO-02":"Policy is reviewed, updated, communicated, and enforced to reflect changes in requirements, threats, technology, and organisational mission","GV.RR-01":"Organisational leadership is responsible and accountable for cybersecurity risk and fosters a culture of cybersecurity risk awareness","GV.RR-02":"Roles, responsibilities, and authorities related to cybersecurity risk management are established, communicated, and enforced","GV.RR-03":"Adequate resources are allocated commensurate with the cybersecurity risk strategy, roles, responsibilities, and policies","GV.OC-02":"Internal and external stakeholders are determined, and their needs and expectations regarding cybersecurity risk management are understood","GV.OC-03":"Legal, regulatory, and contractual requirements regarding cybersecurity — including privacy and civil liberties obligations — are understood and managed","GV.OV-01":"Cybersecurity risk management strategy outcomes are reviewed to inform and adjust strategy and direction","GV.OV-02":"The cybersecurity risk management strategy is reviewed and adjusted to ensure coverage of organisational requirements and risks","GV.OV-03":"Organisational cybersecurity risk management performance is evaluated and reviewed for adjustments needed","GV.SC-01":"A cybersecurity supply chain risk management program, strategy, objectives, policies, and processes are established and agreed to by organisational stakeholders","GV.SC-03":"Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes","GV.SC-04":"Suppliers are known and prioritised by criticality","GV.SC-05":"Requirements to address cybersecurity risks in supply chains are established, prioritised, and integrated into contracts and other agreements with suppliers","GV.SC-06":"Planning and due diligence are conducted to reduce risks before entering into formal supplier or other third-party relationships","GV.SC-07":"The risks posed by a supplier, their products and services, and other third parties are identified, recorded, prioritised, assessed, responded to, and monitored over the course of the relationship","GV.SC-09":"Supply chain security practices are integrated into cybersecurity and enterprise risk management programs, and their performance is monitored throughout the technology product and service life cycle","GV.SC-10":"Cybersecurity supply chain risk management plans include provisions for activities that occur after the conclusion of a partnership or service agreement","ID.AM-01":"Inventories of hardware managed by the organisation are maintained","ID.AM-02":"Inventories of software, services, and systems managed by the organisation are maintained","ID.AM-05":"Assets are prioritised based on classification, criticality, resources, and impact on the mission","ID.IM-01":"Improvements are identified from evaluations","ID.RA-01":"Vulnerabilities in assets are identified, validated, and recorded","ID.RA-02":"Cyber threat intelligence is received from information sharing forums and sources","PR.AA-01":"Identities and credentials for authorised users, services, and hardware are managed by the organisation","PR.AA-02":"Identities are proofed and bound to credentials based on the context of interactions","PR.AA-03":"Users, services, and hardware are authenticated","PR.AA-05":"Access permissions, entitlements, and authorisations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties","PR.AA-06":"Physical access to assets is managed, monitored, and enforced commensurate with risk","PR.AT-01":"Personnel are provided cybersecurity awareness and training so that they can perform their cybersecurity-related tasks","PR.AT-02":"Individuals in specialised roles are provided with cybersecurity awareness and training so that they possess the knowledge and skills to perform relevant tasks","PR.DS-01":"The confidentiality, integrity, and availability of data-at-rest are protected","PR.DS-02":"The confidentiality, integrity, and availability of data-in-transit are protected","PR.IR-02":"The organisation's technology assets are protected from environmental threats","PR.IR-03":"Mechanisms are implemented to achieve resilience requirements in normal and adverse situations","PR.PS-01":"Configuration management practices are established and applied","PR.PS-02":"Software is maintained, replaced, and removed commensurate with risk","PR.PS-06":"Secure software development practices are integrated, and their performance is monitored throughout the software development life cycle","DE.AE-02":"Potentially adverse events are analysed to better understand associated activities","DE.AE-03":"Information is correlated from multiple sources","DE.CM-01":"Networks and network services are monitored to find potentially adverse events","DE.CM-02":"The physical environment is monitored to find potentially adverse events","DE.CM-06":"External service provider activities and services are monitored to find potentially adverse events","DE.CM-09":"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events","RS.CO-03":"Information is shared with designated internal and external stakeholders","RS.MA-01":"The incident response plan is executed in coordination with relevant third parties once an incident is declared","RS.MA-02":"Incident reports are triaged and validated","RS.MA-03":"Incidents are categorised and prioritised","RS.MA-04":"Incidents are escalated or elevated as needed","RS.MA-05":"The criteria for initiating incident recovery are applied","RC.RP-01":"The recovery portion of the incident response plan is executed once initiated from the incident response process","RC.RP-02":"Recovery actions are selected, scoped, prioritised, and performed","RC.RP-03":"The integrity of backups and other restoration assets is verified before using them for restoration"};
+
+var SOC2_DESC={"CC1.1":"The entity demonstrates a commitment to integrity and ethical values","CC1.3":"Management establishes, with board oversight, structures, reporting lines, and appropriate authorities and responsibilities in the pursuit of objectives","CC1.4":"The entity demonstrates a commitment to attract, develop, and retain competent individuals in alignment with objectives","CC1.5":"The entity holds individuals accountable for their internal control responsibilities in the pursuit of objectives","CC2.2":"The entity internally communicates information, including objectives and responsibilities for internal control, necessary to support the functioning of internal control","CC2.3":"The entity communicates with external parties regarding matters affecting the functioning of internal control","CC3.1":"The entity specifies objectives with sufficient clarity to enable the identification and assessment of risks relating to objectives","CC4.1":"The entity selects, develops, and performs ongoing and/or separate evaluations to ascertain whether components of internal control are present and functioning","CC4.2":"The entity evaluates and communicates internal control deficiencies in a timely manner to those parties responsible for taking corrective action","CC5.1":"The entity selects and develops control activities that contribute to the mitigation of risks to the achievement of objectives to acceptable levels","CC5.2":"The entity also selects and develops general control activities over technology to support the achievement of objectives","CC6.1":"The entity implements logical access security software, infrastructure, and architectures over protected information assets","CC6.2":"Prior to issuing system credentials and granting system access, the entity registers and authorises new internal and external users","CC6.3":"The entity authorises, modifies, or removes access to data, software, functions, and other protected information assets based on roles, responsibilities, or the system design and changes","CC6.4":"The entity restricts physical access to facilities and protected information assets to authorised personnel","CC6.5":"The entity discontinues logical and physical protections over physical assets only after the ability to read or recover data and software from those assets has been diminished","CC6.6":"The entity implements logical access security measures to protect against threats from sources outside its system boundaries","CC6.7":"The entity restricts the transmission, movement, and removal of information to authorised internal and external users and processes","CC6.8":"The entity implements controls to prevent or detect and act upon the introduction of unauthorised or malicious software","CC7.1":"To meet its objectives, the entity uses detection and monitoring procedures to identify changes to configurations that result in the introduction of new vulnerabilities","CC7.2":"The entity monitors system components and the operation of those components for anomalies that are indicative of malicious acts, natural disasters, and errors","CC7.3":"The entity evaluates potential security events to determine whether they could impact the ability of the entity to achieve its objectives","CC7.4":"The entity responds to identified security incidents by executing a defined incident response program to understand, contain, remediate, and communicate security incidents","CC7.5":"The entity identifies, develops, and implements activities to recover from identified security incidents","CC8.1":"The entity authorises, designs, develops or acquires, configures, documents, tests, approves, and implements changes to infrastructure, data, software, and procedures to meet its objectives","CC9.2":"The entity assesses and manages risks associated with vendors and business partners","A1.1":"The entity maintains, monitors, and evaluates current processing capacity and use of system components to manage capacity demand","A1.2":"The entity authorises, designs, develops or acquires, implements, operates, approves, maintains, and monitors environmental protections, software, data backup processes, and recovery infrastructure to meet its objectives","A1.3":"The entity tests recovery plan procedures supporting system recovery to meet its objectives","P1.1":"The entity provides notice to data subjects about its privacy practices to meet the entity's objectives related to privacy"};
+
+var CIS_DESC={"CIS 1":"Inventory and Control of Enterprise Assets — Actively manage all enterprise assets connected to the infrastructure","CIS 2":"Inventory and Control of Software Assets — Actively manage all software on the network so only authorised software is installed and can execute","CIS 3":"Data Protection — Develop processes and technical controls to identify, classify, securely handle, retain, and dispose of data","CIS 4":"Secure Configuration of Enterprise Assets and Software — Establish and maintain secure configuration of enterprise assets and software","CIS 5":"Account Management — Use processes and tools to assign and manage authorisation to credentials for user accounts","CIS 6":"Access Control Management — Use processes and tools to create, assign, manage, and revoke access credentials and privileges for user, administrator, and service accounts","CIS 7":"Continuous Vulnerability Management — Develop a plan to continuously assess and track vulnerabilities on all enterprise assets","CIS 8":"Audit Log Management — Collect, alert, review, and retain audit logs of events that could help detect, understand, or recover from an attack","CIS 9":"Email and Web Browser Protections — Improve protections and detections of threats from email and web vectors","CIS 10":"Malware Defences — Prevent or control the installation, spread, and execution of malicious applications, code, or scripts on enterprise assets","CIS 11":"Data Recovery — Establish and maintain data recovery practices sufficient to restore in-scope enterprise assets to a pre-incident and trusted state","CIS 12":"Network Infrastructure Management — Establish and maintain the secure configuration of network devices","CIS 13":"Network Monitoring and Defence — Operate processes and tooling to establish and maintain comprehensive network monitoring and defence against security threats","CIS 14":"Security Awareness and Skills Training — Establish and maintain a security awareness programme to influence behaviour among the workforce","CIS 15":"Service Provider Management — Develop a process to evaluate service providers who hold sensitive data or are responsible for critical IT platforms or processes","CIS 16":"Application Software Security — Manage the security life cycle of in-house developed, hosted, or acquired software to prevent, detect, and remediate security weaknesses","CIS 17":"Incident Response Management — Establish a program to develop and maintain an incident response capability","CIS 18":"Penetration Testing — Test the effectiveness and resiliency of enterprise assets through identifying and exploiting weaknesses in controls"};
+
+var PCI_DESC={"Req 1":"Install and Maintain Network Security Controls","Req 2":"Apply Secure Configurations to All System Components","Req 3":"Protect Stored Account Data","Req 4":"Protect Cardholder Data with Strong Cryptography During Transmission Over Open, Public Networks","Req 5":"Protect All Systems and Networks from Malicious Software","Req 6":"Develop and Maintain Secure Systems and Software","Req 6.1":"Processes and mechanisms for developing and maintaining secure systems and software are defined and understood","Req 6.5":"Changes to all system components are managed securely","Req 7":"Restrict Access to System Components and Cardholder Data by Business Need to Know","Req 8":"Identify Users and Authenticate Access to System Components","Req 9":"Restrict Physical Access to Cardholder Data","Req 10":"Log and Monitor All Access to System Components and Cardholder Data","Req 11":"Test Security of Systems and Networks Regularly","Req 12":"Support Information Security with Organisational Policies and Programs","Req 12.6":"Security awareness education is an ongoing activity","Req 12.7":"Personnel are screened to reduce risks from insider threats","Req 12.8":"Risk to information assets associated with third-party service provider relationships is managed","Req 12.10":"Security incidents and suspected security incidents are responded to immediately"};
+
+var CE_DESC={"Access Control":"Ensure that only authorised users can access your devices, systems, and data using user accounts and strong authentication","Secure Config":"Ensure computers and network devices are properly configured to reduce vulnerabilities and provide only the services required","Firewalls":"Establish network boundary defences, particularly internet gateways, using firewalls or equivalent network devices","Malware Protection":"Protect against malware using anti-malware software and other malware protection measures appropriate to the risk","Security Updates":"Keep devices, software, and applications up to date by applying patches and updates in a timely manner","N/A":""};
+
+var CONTROLS=[
+{id:"A.5.1",name:"Policies for information security",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-01, GV.PO-02",soc2:"CC1.1, CC5.2",cis:"CIS 1, CIS 2",pci:"Req 12",ce:"N/A",notes:"Establish a top-level information security policy approved by senior management, supported by topic-specific policies (e.g. access control, data classification, incident response). Review at least annually or after significant changes. Ensure policies are communicated to all staff, contractors, and relevant third parties. Map each policy to specific framework requirements across ISO 27001, NIST CSF, SOC 2, and PCI DSS to demonstrate cross-framework alignment during audits."},
+{id:"A.5.2",name:"Information security roles and responsibilities",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-01, GV.RR-02",soc2:"CC1.3, CC1.4",cis:"CIS 1",pci:"Req 12",ce:"N/A",notes:"Define a RACI matrix covering all information security functions including risk management, incident response, compliance monitoring, and security architecture. Assign an Information Security Manager or CISO with clear authority. Ensure segregation between those who authorise, implement, and review security controls. Document reporting lines to senior management and the board. Review role assignments during organisational restructures."},
+{id:"A.5.3",name:"Segregation of duties",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC5.1, CC6.1",cis:"CIS 5, CIS 6",pci:"Req 7",ce:"Access Control",notes:"Implement segregation of duties to prevent any single individual from controlling all aspects of a critical process. Map critical business processes and identify conflict-of-interest pairs (e.g. change approval vs. deployment, user provisioning vs. access review). Where segregation is not feasible due to team size, implement compensating controls such as enhanced logging, management review, and dual authorisation for high-risk actions."},
+{id:"A.5.4",name:"Management responsibilities",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-03",soc2:"CC1.4",cis:"CIS 14",pci:"Req 12",ce:"N/A",notes:"Ensure management at all levels actively demonstrate support for information security through resource allocation, participation in security governance forums, and leading by example. Management should sign off on security policies, attend security briefings, and champion security awareness initiatives. Include information security responsibilities in job descriptions and performance reviews for managers."},
+{id:"A.5.5",name:"Contact with authorities",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.CO",nistSub:"RS.CO-03",soc2:"CC7.4",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Maintain a register of relevant authorities including the ICO (data protection), NCSC (cyber incidents), sector-specific regulators (FCA, OFCOM etc.), and law enforcement contacts. Define clear thresholds and procedures for when to engage each authority. Ensure incident response playbooks include authority notification timelines (e.g. ICO 72-hour breach notification). Test contact procedures during tabletop exercises."},
+{id:"A.5.6",name:"Contact with special interest groups",cat:"Organizational",nistFunc:"IDENTIFY",nistCat:"ID.IM",nistSub:"ID.IM-01",soc2:"CC7.4",cis:"CIS 17",pci:"Req 12",ce:"N/A",notes:"Join relevant information sharing communities such as CiSP (NCSC), sector-specific ISACs, OWASP chapters, Cloud Security Alliance, and vendor security advisory lists. Assign responsibility for monitoring threat feeds and sharing actionable intelligence internally. Participate actively rather than passively — contribute anonymised threat data and attend community meetings. Use insights to update risk assessments and security controls."},
+{id:"A.5.7",name:"Threat intelligence",cat:"Organizational",nistFunc:"IDENTIFY",nistCat:"ID.RA",nistSub:"ID.RA-02",soc2:"CC3.1, CC7.2",cis:"CIS 7, CIS 13",pci:"Req 6.1",ce:"N/A",notes:"Establish a threat intelligence capability that ingests data from multiple sources: commercial feeds, open source (OSINT), government advisories (NCSC, CISA), industry ISACs, and dark web monitoring. Contextualise intelligence against your asset inventory and risk profile. Integrate threat intelligence into vulnerability management prioritisation, SOC alert tuning, and risk assessment processes. Review and update threat landscape assessments quarterly."},
+{id:"A.5.8",name:"Information security in project management",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-02",soc2:"CC3.1",cis:"CIS 16",pci:"Req 6",ce:"N/A",notes:"Embed security checkpoints at each project phase: initiation (security requirements), design (threat modelling), build (secure coding standards), test (security testing), and deployment (hardening checklists). Require a security impact assessment for all projects handling sensitive data or modifying critical systems. Include security sign-off as a gate criterion before go-live. Track security debt from projects in a centralised register."},
+{id:"A.5.9",name:"Inventory of information and other associated assets",cat:"Organizational",nistFunc:"IDENTIFY",nistCat:"ID.AM",nistSub:"ID.AM-01, ID.AM-02",soc2:"CC6.1",cis:"CIS 1, CIS 2",pci:"Req 2, Req 9",ce:"N/A",notes:"Maintain a comprehensive asset inventory covering hardware (servers, endpoints, network devices, IoT), software (applications, SaaS, licenses), data assets (databases, file shares, cloud storage), and cloud resources (IaaS, PaaS, SaaS accounts). Automate discovery using CMDB tools, network scanning, and cloud API integration. Assign owners to every asset. Review and reconcile the inventory at least quarterly. Link assets to business processes and data classification levels."},
+{id:"A.5.10",name:"Acceptable use of information and other associated assets",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-01",soc2:"CC1.1, CC6.1",cis:"CIS 1",pci:"Req 12",ce:"N/A",notes:"Develop an Acceptable Use Policy covering use of corporate devices, email, internet, social media, personal devices (BYOD), removable media, and cloud services. Include clear rules on prohibited activities, data handling expectations, and consequences of violations. Require all staff and contractors to acknowledge the AUP during onboarding and annually thereafter. Update the AUP to address emerging technologies and work patterns (e.g. AI tools, remote working)."},
+{id:"A.5.11",name:"Return of assets",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.5",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Include asset return in the formal offboarding checklist covering laptops, mobile devices, access cards, tokens, keys, and any company data on personal devices. Verify return within the employee\'s notice period. For remote workers, arrange courier collection or office drop-off. Wipe and re-image returned devices before reissue. Coordinate with IT, HR, and facilities to ensure nothing is missed. Document the process with sign-off from the leaver and their manager."},
+{id:"A.5.12",name:"Classification of information",cat:"Organizational",nistFunc:"IDENTIFY",nistCat:"ID.AM",nistSub:"ID.AM-05",soc2:"CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Define a data classification scheme with clear levels (e.g. Public, Internal, Confidential, Restricted) and criteria for each. Map classification to handling requirements: storage encryption, access controls, sharing restrictions, and retention periods. Provide training and practical examples to help staff classify data correctly. Assign data owners responsible for classification decisions. Review classifications when data is repurposed or shared with new parties."},
+{id:"A.5.13",name:"Labelling of information",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Implement labelling mechanisms that match your classification scheme: email headers/footers, document watermarks, file metadata tags, and database field-level labels. Automate labelling using Microsoft Information Protection, Google DLP, or equivalent tools. Ensure labels persist when data is copied, shared, or transformed. Train staff to apply labels manually where automation is not possible. Regularly audit labelling compliance."},
+{id:"A.5.14",name:"Information transfer",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 3, CIS 13",pci:"Req 4",ce:"N/A",notes:"Define secure transfer procedures for each channel: encrypted email (TLS/S-MIME), secure file sharing platforms (not personal cloud accounts), SFTP for batch transfers, and encrypted APIs for system-to-system. Prohibit transfer of Confidential/Restricted data via unencrypted channels. Implement DLP rules to detect and block policy violations. Maintain transfer agreements with third parties specifying security requirements. Log and monitor all transfers of sensitive data."},
+{id:"A.5.15",name:"Access control",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-01, PR.AA-03",soc2:"CC6.1, CC6.2, CC6.3",cis:"CIS 5, CIS 6",pci:"Req 7, Req 8",ce:"Access Control",notes:"Implement access control based on the principle of least privilege and need-to-know. Define an access control policy covering authentication, authorisation, and accounting requirements. Use role-based access control (RBAC) as the baseline, supplemented by attribute-based access control (ABAC) for complex scenarios. Require formal access requests with manager and data owner approval. Conduct quarterly access reviews for critical systems and annual reviews for all others."},
+{id:"A.5.16",name:"Identity management",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-01, PR.AA-02",soc2:"CC6.1, CC6.2",cis:"CIS 5, CIS 6",pci:"Req 8",ce:"Access Control",notes:"Establish a formal identity lifecycle process covering joiners (provisioning), movers (role changes), and leavers (deprovisioning). Integrate with HR systems to trigger automated workflows. Verify identity before issuing credentials using government-issued ID or equivalent. Implement unique user IDs — prohibit shared or generic accounts. Maintain a central identity directory (e.g. Azure AD, Okta) as the single source of truth. Disable accounts within 24 hours of termination."},
+{id:"A.5.17",name:"Authentication information",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-02, PR.AA-03",soc2:"CC6.1",cis:"CIS 5, CIS 6",pci:"Req 8",ce:"Access Control",notes:"Enforce multi-factor authentication (MFA) for all remote access, privileged accounts, cloud services, and email. Implement a strong password policy: minimum 12 characters, complexity requirements, and prohibition of known breached passwords. Deploy a password manager for staff. Manage service account credentials in a secrets vault (e.g. HashiCorp Vault, AWS Secrets Manager) with automatic rotation. Prohibit hardcoded credentials in source code."},
+{id:"A.5.18",name:"Access rights",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05, PR.AA-06",soc2:"CC6.2, CC6.3",cis:"CIS 5, CIS 6",pci:"Req 7, Req 8",ce:"Access Control",notes:"Conduct quarterly access reviews for privileged and high-risk systems, and annual reviews for all other systems. Verify that access rights match current roles and responsibilities. Remove orphaned accounts, excessive privileges, and access for leavers. Implement automated access certification campaigns using identity governance tools. Require re-approval for access rights that have not been used within 90 days. Document review outcomes and remediation actions."},
+{id:"A.5.19",name:"Information security in supplier relationships",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-01, GV.SC-03",soc2:"CC9.2",cis:"CIS 15",pci:"Req 12.8",ce:"N/A",notes:"Establish a supplier security assessment framework with risk-based tiers (Critical, High, Medium, Low) based on data access, system integration, and business dependency. Require security questionnaires, SOC 2 reports, ISO 27001 certificates, or penetration test results based on tier. Include information security requirements in procurement processes. Maintain a supplier risk register. Conduct due diligence before onboarding and ongoing monitoring thereafter."},
+{id:"A.5.20",name:"Addressing info security within supplier agreements",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-04, GV.SC-05",soc2:"CC9.2",cis:"CIS 15",pci:"Req 12.8",ce:"N/A",notes:"Include specific security clauses in all supplier contracts: data protection obligations, right to audit, breach notification timelines (e.g. 24-48 hours), subcontractor flow-down requirements, data return/destruction on termination, and compliance with applicable regulations (GDPR, PCI DSS). Define service levels for security-relevant metrics. Require evidence of security controls (e.g. annual SOC 2 reports). Include termination provisions for material security failures."},
+{id:"A.5.21",name:"Managing info security in the ICT supply chain",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-06, GV.SC-07",soc2:"CC9.2",cis:"CIS 15, CIS 16",pci:"Req 12.8",ce:"N/A",notes:"Map your ICT supply chain to identify fourth-party dependencies and single points of failure. Require suppliers to maintain Software Bills of Materials (SBOMs) for critical software. Assess risks from supply chain attacks (e.g. SolarWinds-style compromises). Implement code signing and integrity verification for software updates. Monitor supplier security posture using continuous monitoring tools (e.g. SecurityScorecard, BitSight). Include supply chain scenarios in business continuity planning."},
+{id:"A.5.22",name:"Monitoring, review & change mgmt of supplier services",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-09, GV.SC-10",soc2:"CC9.2",cis:"CIS 15",pci:"Req 12.8",ce:"N/A",notes:"Conduct at least annual reviews of critical supplier security posture. Monitor for changes in supplier risk profile: acquisitions, breaches, financial instability, or regulatory actions. Require suppliers to notify you of material security changes. Review and update security requirements when contracts are renewed. Assess the impact of supplier changes on your security controls. Maintain documentation of all review outcomes and follow-up actions."},
+{id:"A.5.23",name:"Information security for use of cloud services",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-07",soc2:"CC6.1, CC9.2",cis:"CIS 3, CIS 15",pci:"Req 12.8",ce:"N/A",notes:"Implement a cloud security governance framework covering provider selection, configuration standards, data residency requirements, and shared responsibility model documentation. Require CSA STAR certification or SOC 2 reports for cloud providers. Implement cloud security posture management (CSPM) tools. Define and enforce cloud security baselines (e.g. CIS Benchmarks for AWS/Azure/GCP). Monitor for misconfigurations, exposed storage, and excessive permissions. Encrypt data at rest and in transit."},
+{id:"A.5.24",name:"Incident management planning and preparation",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.MA",nistSub:"RS.MA-01",soc2:"CC7.3, CC7.4",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Develop incident response playbooks for common scenarios: ransomware, data breach, DDoS, insider threat, supply chain compromise, and business email compromise. Define incident severity levels and escalation paths. Establish an incident response team with clear roles (Incident Commander, Technical Lead, Communications Lead, Legal). Maintain an out-of-hours contact list. Ensure playbooks include regulatory notification requirements. Test plans through tabletop exercises at least twice yearly."},
+{id:"A.5.25",name:"Assessment and decision on security events",cat:"Organizational",nistFunc:"DETECT",nistCat:"DE.AE",nistSub:"DE.AE-02, DE.AE-03",soc2:"CC7.2, CC7.3",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Define clear criteria for triaging security events into categories: false positive, informational, investigation required, or confirmed incident. Implement automated correlation and enrichment in your SIEM to reduce analyst workload. Establish escalation thresholds based on asset criticality, data sensitivity, and attack type. Document triage decisions and rationale. Maintain a security event taxonomy aligned with MITRE ATT&CK for consistent categorisation."},
+{id:"A.5.26",name:"Response to information security incidents",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.MA",nistSub:"RS.MA-02, RS.MA-03",soc2:"CC7.4",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Follow a structured response methodology: Preparation, Identification, Containment (short-term and long-term), Eradication, Recovery, and Lessons Learned. Define containment strategies for different incident types (e.g. network isolation for ransomware, credential reset for account compromise). Coordinate response across IT, security, legal, communications, and HR. Preserve forensic evidence before remediation. Communicate with affected stakeholders in accordance with your communications plan."},
+{id:"A.5.27",name:"Learning from information security incidents",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.MA",nistSub:"RS.MA-05",soc2:"CC7.5",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Conduct a formal post-incident review (PIR) within two weeks of incident closure. Use a blameless approach focusing on systemic improvements rather than individual fault. Document root cause analysis, timeline of events, what worked well, what needs improvement, and specific action items with owners and deadlines. Track remediation to completion. Share anonymised lessons across the organisation. Update playbooks, detection rules, and controls based on findings."},
+{id:"A.5.28",name:"Collection of evidence",cat:"Organizational",nistFunc:"RESPOND",nistCat:"RS.MA",nistSub:"RS.MA-04",soc2:"CC7.4",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Establish forensic readiness procedures including evidence preservation protocols, chain of custody documentation, and approved forensic tools. Train incident responders in evidence handling. Enable sufficient logging and retention to support investigations. Engage specialist forensic providers on retainer for complex incidents. Ensure evidence collection methods are legally admissible. Document all forensic activities with timestamps and investigator details."},
+{id:"A.5.29",name:"Information security during disruption",cat:"Organizational",nistFunc:"RECOVER",nistCat:"RC.RP",nistSub:"RC.RP-01",soc2:"A1.2",cis:"CIS 11, CIS 17",pci:"Req 9",ce:"N/A",notes:"Integrate information security requirements into business continuity plans (BCP) and disaster recovery (DR) plans. Ensure security controls remain effective during disruption — avoid reducing security posture for operational convenience. Address scenarios where primary security infrastructure is unavailable. Include cybersecurity incidents (e.g. ransomware) in BCP scenarios. Test failover security controls during DR exercises. Document alternative security procedures for degraded operations."},
+{id:"A.5.30",name:"ICT readiness for business continuity",cat:"Organizational",nistFunc:"RECOVER",nistCat:"RC.RP",nistSub:"RC.RP-02, RC.RP-03",soc2:"A1.2, A1.3",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"Define Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO) for all critical systems based on business impact analysis. Implement DR solutions that meet these targets: hot standby for critical systems, warm standby for important systems, and cold backups for others. Test recovery procedures at least annually with realistic scenarios. Document recovery runbooks with step-by-step instructions. Verify data integrity after restoration. Maintain off-site and offline backup copies to protect against ransomware."},
+{id:"A.5.31",name:"Legal, statutory, regulatory and contractual requirements",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.OC",nistSub:"GV.OC-02, GV.OC-03",soc2:"CC2.2, CC2.3",cis:"CIS 1",pci:"Req 12",ce:"N/A",notes:"Maintain a register of all applicable legal, statutory, regulatory, and contractual requirements covering data protection (GDPR, DPA 2018), sector regulations (FCA, NHS DSPT), cyber regulations (NIS2), payment standards (PCI DSS), and contractual obligations. Assign owners for each requirement. Monitor for regulatory changes and assess impact. Map requirements to specific security controls to demonstrate compliance. Review the register at least annually and after significant regulatory changes."},
+{id:"A.5.32",name:"Intellectual property rights",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.OC",nistSub:"GV.OC-03",soc2:"CC2.2",cis:"CIS 2",pci:"Req 12",ce:"N/A",notes:"Maintain a software licence register covering all commercial, open-source, and SaaS licences. Implement software asset management (SAM) tools to track licence usage and compliance. Include IP clauses in employment contracts covering ownership of work product. Define procedures for using open-source software including licence compatibility checks. Train developers on IP obligations. Conduct periodic licence compliance audits."},
+{id:"A.5.33",name:"Protection of records",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Define retention schedules for all record types based on legal requirements, regulatory obligations, and business needs. Implement automated retention and deletion policies in document management systems, email, and databases. Protect records from unauthorised modification or deletion using write-once storage, access controls, and integrity checking. Ensure records are recoverable within required timeframes. Document secure destruction procedures including certificates of destruction for physical media."},
+{id:"A.5.34",name:"Privacy and protection of PII",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"P1.1, CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Conduct Data Protection Impact Assessments (DPIAs) for high-risk processing activities. Implement privacy by design and by default in all systems processing personal data. Maintain Records of Processing Activities (ROPA). Implement data subject rights procedures (access, erasure, portability, objection). Deploy data discovery and classification tools to locate PII across systems. Minimise data collection and retention. Encrypt PII at rest and in transit. Appoint a Data Protection Officer where required."},
+{id:"A.5.35",name:"Independent review of information security",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.OV",nistSub:"GV.OV-01, GV.OV-02",soc2:"CC4.1",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Commission independent reviews of the ISMS at planned intervals: internal audits at least annually covering all domains, external certification audits per the ISO 27001 cycle, and penetration testing at least annually or after significant changes. Ensure auditors are independent from the areas being reviewed. Track audit findings to closure with evidence of remediation. Report audit results to senior management and the board. Use audit findings to drive continuous improvement."},
+{id:"A.5.36",name:"Compliance with policies, rules and standards",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.OV",nistSub:"GV.OV-03",soc2:"CC4.2",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Implement a compliance monitoring programme with regular self-assessments against all applicable frameworks and standards. Use automated compliance scanning tools for technical controls (e.g. CIS benchmarks, cloud configuration). Maintain a compliance dashboard showing status across all frameworks. Conduct gap assessments when new requirements emerge. Track non-conformities with root cause analysis and corrective action plans. Report compliance status to senior management quarterly."},
+{id:"A.5.37",name:"Documented operating procedures",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"CC7.1",cis:"CIS 4",pci:"Req 12",ce:"N/A",notes:"Develop Standard Operating Procedures (SOPs) for all security-critical processes: user provisioning/deprovisioning, backup and restore, patch management, incident response, change management, vulnerability scanning, and log review. Include step-by-step instructions, responsible roles, escalation procedures, and expected outcomes. Version control all procedures and review at least annually. Ensure SOPs are accessible to all relevant staff. Test procedures through regular drills."},
+{id:"A.6.1",name:"Screening",cat:"People",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-02",soc2:"CC1.4",cis:"CIS 14",pci:"Req 12.7",ce:"N/A",notes:"Screen all candidates before employment using identity verification, criminal records checks (DBS), reference checks, qualification verification, and credit checks where appropriate for the role. Apply enhanced screening (e.g. BS 7858) for roles with access to sensitive data or critical systems. Re-screen personnel when they move to higher-trust roles. Extend screening requirements to contractors and temporary staff through contractual agreements with agencies."},
+{id:"A.6.2",name:"Terms and conditions of employment",cat:"People",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-02",soc2:"CC1.4",cis:"CIS 14",pci:"Req 12",ce:"N/A",notes:"Include information security responsibilities in employment contracts and job descriptions. Require staff to sign acceptable use policies, non-disclosure agreements, and data protection acknowledgements. Clearly state consequences of security policy violations. Cover obligations that continue after employment ends (e.g. confidentiality, return of assets, data handling). Review terms when roles change significantly. Ensure contractor agreements include equivalent security obligations."},
+{id:"A.6.3",name:"Information security awareness, education and training",cat:"People",nistFunc:"PROTECT",nistCat:"PR.AT",nistSub:"PR.AT-01, PR.AT-02",soc2:"CC1.4, CC2.2",cis:"CIS 14",pci:"Req 12.6",ce:"N/A",notes:"Deliver a multi-layered security awareness programme: mandatory induction training for new starters, annual refresher training for all staff, role-based training for privileged users and developers, and continuous reinforcement through simulated phishing campaigns, newsletters, and security champions. Measure effectiveness through completion rates, phishing simulation results, and security incident trends. Tailor content to current threats and recent incidents. Require completion as a condition of continued system access."},
+{id:"A.6.4",name:"Disciplinary process",cat:"People",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-02",soc2:"CC1.5",cis:"CIS 14",pci:"Req 12",ce:"N/A",notes:"Define a clear, documented disciplinary process for security policy violations, graduated from informal warnings to formal action depending on severity and intent. Ensure the process is fair, consistent, and aligned with employment law. Involve HR and legal in serious cases. Communicate the existence of the process to all staff as a deterrent. Document all disciplinary actions and outcomes. Use incidents as learning opportunities where appropriate."},
+{id:"A.6.5",name:"Responsibilities after termination or change",cat:"People",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.5",cis:"CIS 5",pci:"Req 8",ce:"Access Control",notes:"Define post-employment/engagement obligations in contracts including ongoing confidentiality, non-compete clauses where applicable, return of all information and assets, and secure deletion of company data from personal devices. Conduct exit interviews covering security obligations. Ensure all access is revoked on or before the last day. Monitor for data exfiltration during the notice period for high-risk departures. Maintain records of offboarding completion."},
+{id:"A.6.6",name:"Confidentiality or non-disclosure agreements",cat:"People",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-05",soc2:"CC9.2",cis:"CIS 14",pci:"Req 12",ce:"N/A",notes:"Require NDAs or confidentiality clauses for all staff, contractors, consultants, and third parties with access to confidential information. Tailor NDA scope to the specific information and duration of engagement. Review and refresh NDAs when roles change or when access to new categories of information is granted. Ensure NDAs are legally enforceable in relevant jurisdictions. Maintain a register of signed NDAs with expiry dates."},
+{id:"A.6.7",name:"Remote working",cat:"People",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 12",pci:"Req 12",ce:"Secure Config",notes:"Establish a remote working security policy covering: mandatory VPN for corporate network access, endpoint protection requirements (EDR, disk encryption, up-to-date patching), secure Wi-Fi requirements (WPA3, no public Wi-Fi for sensitive work), physical security of devices and documents, approved collaboration tools, and clear desk/clear screen at home. Provide equipment that meets security standards. Conduct periodic remote security assessments. Address the risks of co-working spaces and public transport."},
+{id:"A.6.8",name:"Information security event reporting",cat:"People",nistFunc:"DETECT",nistCat:"DE.AE",nistSub:"DE.AE-02",soc2:"CC7.2, CC7.3",cis:"CIS 17",pci:"Req 12.10",ce:"N/A",notes:"Establish clear, accessible channels for reporting security events: dedicated email address, internal ticketing system, phone hotline, and anonymous reporting option. Ensure all staff know how to recognise and report potential security events. Set expectations for response times. Protect reporters from retaliation. Acknowledge reports promptly and provide feedback on outcomes. Track reporting metrics as an indicator of security culture maturity."},
+{id:"A.7.1",name:"Physical security perimeters",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.4",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Define physical security zones based on sensitivity: public areas, staff-only areas, restricted areas (server rooms, data centres), and high-security areas (safes, secure rooms). Implement appropriate controls at each perimeter: reception desks, access card readers, biometric scanners, mantraps, and anti-tailgating measures. Monitor perimeter access points with CCTV. Conduct regular physical security assessments. Ensure perimeter controls are resilient to common bypass techniques."},
+{id:"A.7.2",name:"Physical entry",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.4",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Implement multi-factor physical access control for restricted areas: access card plus PIN or biometric. Maintain visitor management procedures: pre-registration, ID verification, badge issuance, escort requirements, and sign-out. Log all physical access with timestamps and retain logs for at least 90 days. Conduct regular reviews of physical access rights. Immediately revoke access for terminated personnel. Test access controls regularly to identify tailgating or bypass risks."},
+{id:"A.7.3",name:"Securing offices, rooms and facilities",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.4",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Secure server rooms, network closets, and sensitive areas with reinforced walls, security-rated doors, and monitored locks. Ensure offices containing sensitive equipment or documents are locked when unoccupied. Implement clean desk policy enforcement. Restrict knowledge of sensitive area locations to need-to-know personnel. Install intruder alarms with 24/7 monitoring. Conduct regular physical security walkthroughs."},
+{id:"A.7.4",name:"Physical security monitoring",cat:"Physical",nistFunc:"DETECT",nistCat:"DE.CM",nistSub:"DE.CM-02",soc2:"CC6.4, CC7.2",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Deploy CCTV coverage at all entry/exit points, perimeters, server rooms, and other sensitive areas. Ensure cameras provide sufficient resolution for identification. Implement 24/7 monitoring or AI-based alerting for out-of-hours activity. Retain CCTV footage for a minimum of 30 days. Protect camera systems from tampering and unauthorised access. Complement CCTV with intruder detection systems and security patrols. Ensure compliance with GDPR and surveillance camera codes of practice."},
+{id:"A.7.5",name:"Protecting against physical and environmental threats",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-03",soc2:"A1.2",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"Implement environmental controls appropriate to the risk: fire detection and suppression (FM-200, inert gas for server rooms), flood detection and drainage, temperature and humidity monitoring, earthquake protection where applicable, and protection against electromagnetic interference. Maintain environmental monitoring with automated alerting. Test fire suppression and detection systems at least annually. Ensure insurance coverage reflects environmental risks."},
+{id:"A.7.6",name:"Working in secure areas",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-06",soc2:"CC6.4",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Restrict activities in secure areas: no photography, no personal mobile devices, supervised access for visitors and contractors, requirement to display ID at all times, and prohibition of unaccompanied work outside business hours. Maintain access logs for secure areas. Limit knowledge of secure area locations and contents. Conduct regular sweeps for unauthorised devices. Brief all personnel on secure area rules before granting access."},
+{id:"A.7.7",name:"Clear desk and clear screen",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1",cis:"CIS 3",pci:"Req 9",ce:"N/A",notes:"Enforce clear desk and clear screen as mandatory policy: lock screens after 5 minutes of inactivity (enforced via GPO/MDM), secure sensitive documents in locked drawers/cabinets when not in use, use privacy screens on devices in shared or public areas, shred rather than bin paper documents, and clear whiteboards after meetings. Conduct regular compliance checks with spot audits. Include clear desk/screen in security awareness training."},
+{id:"A.7.8",name:"Equipment siting and protection",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-03",soc2:"A1.2",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Position critical equipment (servers, networking, UPS) in secure, access-controlled rooms with appropriate environmental controls. Protect cable runs from damage and unauthorised access. Ensure adequate cooling, power, and ventilation. Position monitors away from windows to prevent visual eavesdropping. Secure portable equipment with cable locks when unattended. Implement environmental monitoring with automated alerts for temperature, humidity, and water ingress."},
+{id:"A.7.9",name:"Security of assets off-premises",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.6",cis:"CIS 1, CIS 12",pci:"Req 9",ce:"N/A",notes:"Define security requirements for equipment used outside company premises: mandatory full-disk encryption, VPN for all corporate access, remote wipe capability, physical security awareness (never leave unattended in vehicles or public places). Prohibit storage of Confidential/Restricted data on removable media without encryption. Require incident reporting within 4 hours of loss or theft. Include off-premises security in staff awareness training."},
+{id:"A.7.10",name:"Storage media",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.5",cis:"CIS 3",pci:"Req 3, Req 9",ce:"N/A",notes:"Classify storage media (USB drives, external HDDs, tapes, optical media) according to the sensitivity of data stored. Encrypt all media containing Confidential or Restricted data using AES-256 or equivalent. Maintain a register of removable media with assigned owners. Implement port control to restrict unauthorised USB device usage. Define secure transportation procedures for media in transit. Conduct certified destruction (NIST 800-88) for media at end of life with certificates of destruction."},
+{id:"A.7.11",name:"Supporting utilities",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-03",soc2:"A1.2",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"Provide redundant power supplies for critical infrastructure: dual utility feeds where possible, UPS systems sized for at least 15-30 minutes runtime, diesel generators with automatic failover and fuel for 48+ hours. Monitor UPS battery health and replace on schedule. Implement redundant cooling systems. Test failover to backup power quarterly. Ensure supporting utilities (water, telecoms) have appropriate resilience. Document all utility dependencies and single points of failure."},
+{id:"A.7.12",name:"Cabling security",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-03",soc2:"A1.2",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Route data cabling through secure conduits, avoiding public areas where possible. Use fibre optic cables for sensitive links to prevent electromagnetic eavesdropping. Separate power and data cabling to prevent interference. Label and document all cabling. Secure patch panels and distribution frames in locked cabinets. Implement network access control (802.1X) to prevent unauthorised device connection. Regularly audit cable infrastructure for unauthorised connections."},
+{id:"A.7.13",name:"Equipment maintenance",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"A1.1",cis:"CIS 1",pci:"Req 9",ce:"N/A",notes:"Establish a preventive maintenance schedule for all critical equipment aligned with manufacturer recommendations. Restrict maintenance to authorised personnel — verify identity and authorisation before granting access. Supervise third-party maintenance engineers in sensitive areas. Maintain maintenance logs with details of work performed. Verify equipment integrity after maintenance. Address security implications of maintenance — ensure sensitive data is protected when equipment is serviced off-site."},
+{id:"A.7.14",name:"Secure disposal or re-use of equipment",cat:"Physical",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.5",cis:"CIS 3",pci:"Req 3, Req 9",ce:"N/A",notes:"Follow NIST SP 800-88 guidelines for media sanitisation: Clear (logical overwrite), Purge (cryptographic erase or degauss), or Destroy (shred, incinerate, disintegrate) based on data sensitivity. Verify sanitisation before releasing equipment for reuse or disposal. Obtain certificates of destruction from contracted disposal providers. Maintain an auditable trail from asset register to destruction certificate. Consider environmental regulations for electronic waste disposal."},
+{id:"A.8.1",name:"User endpoint devices",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1, CC6.8",cis:"CIS 4, CIS 10",pci:"Req 5",ce:"Malware Protection",notes:"Deploy a comprehensive endpoint protection stack: endpoint detection and response (EDR/XDR), full-disk encryption (BitLocker/FileVault), mobile device management (MDM) for configuration enforcement, automated patching, application whitelisting for high-security environments, and host-based firewall. Enforce security baselines using CIS Benchmarks. Implement network access control to quarantine non-compliant devices. Monitor endpoint health continuously and remediate non-compliance within defined SLAs."},
+{id:"A.8.2",name:"Privileged access rights",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC6.1, CC6.3",cis:"CIS 5, CIS 6",pci:"Req 7, Req 8",ce:"Access Control",notes:"Implement a Privileged Access Management (PAM) solution covering: vaulting of privileged credentials, session recording and monitoring, just-in-time access provisioning, automatic credential rotation, and break-glass procedures for emergencies. Enforce MFA for all privileged access. Separate privileged and standard user accounts. Conduct quarterly reviews of privileged access. Monitor for anomalous privileged account behaviour. Minimise the number of standing privileged accounts."},
+{id:"A.8.3",name:"Information access restriction",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-03, PR.AA-05",soc2:"CC6.1, CC6.3",cis:"CIS 5, CIS 6",pci:"Req 7",ce:"Access Control",notes:"Implement role-based access control (RBAC) as the foundation, supplemented by attribute-based access control (ABAC) for context-sensitive decisions (location, device, time). Enforce access restrictions at application, database, and file system levels. Implement row-level and column-level security for sensitive database fields. Use API gateways to enforce access policies for service-to-service communication. Log all access to sensitive data. Deny by default — require explicit authorisation for all access."},
+{id:"A.8.4",name:"Access to source code",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC6.1",cis:"CIS 6, CIS 16",pci:"Req 6",ce:"N/A",notes:"Store all source code in managed repositories (GitHub, GitLab, Bitbucket) with access restricted to authorised developers. Enforce branch protection rules: require pull request reviews, prevent force pushes to main/production branches, and require CI/CD pipeline passes before merge. Implement code signing for production deployments. Scan repositories for secrets and credentials using automated tools. Restrict access to production deployment pipelines. Audit repository access quarterly."},
+{id:"A.8.5",name:"Secure authentication",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-02, PR.AA-03",soc2:"CC6.1",cis:"CIS 5, CIS 6",pci:"Req 8",ce:"Access Control",notes:"Implement multi-factor authentication (MFA) for all users, prioritising phishing-resistant methods (FIDO2/WebAuthn, hardware security keys) for privileged users and externally-facing systems. Deploy SSO to centralise authentication and reduce password fatigue. Implement adaptive/risk-based authentication that increases assurance for unusual access patterns. Support passwordless authentication where possible. Monitor for credential stuffing and brute force attacks. Enforce account lockout after failed attempts."},
+{id:"A.8.6",name:"Capacity management",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.IR",nistSub:"PR.IR-02",soc2:"A1.1",cis:"CIS 8",pci:"Req 12",ce:"N/A",notes:"Monitor capacity utilisation across compute, storage, network, and licensing dimensions. Implement auto-scaling for cloud workloads with defined upper limits to prevent cost runaway. Set alerting thresholds at 70% and 85% utilisation. Conduct capacity planning reviews quarterly, incorporating growth projections and planned changes. Address capacity-related availability risks in business continuity planning. Monitor for anomalous resource consumption that could indicate cryptomining or DDoS."},
+{id:"A.8.7",name:"Protection against malware",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.8",cis:"CIS 10",pci:"Req 5",ce:"Malware Protection",notes:"Deploy a defence-in-depth malware protection strategy: EDR/XDR on all endpoints, email gateway filtering with attachment sandboxing, web proxy with malware scanning, network-level detection (IDS/IPS), and application whitelisting for high-security systems. Ensure signatures and engines update automatically. Configure real-time scanning plus scheduled full scans. Block execution of scripts and macros by default — whitelist by exception. Monitor for fileless malware and living-off-the-land techniques."},
+{id:"A.8.8",name:"Management of technical vulnerabilities",cat:"Technological",nistFunc:"IDENTIFY",nistCat:"ID.RA",nistSub:"ID.RA-01",soc2:"CC7.1",cis:"CIS 7",pci:"Req 6.1, Req 11",ce:"Security Updates",notes:"Implement a comprehensive vulnerability management programme: automated scanning at least weekly for external-facing assets and monthly for internal assets, prioritisation using CVSS plus asset criticality and exploit availability, defined remediation SLAs (Critical: 48 hours, High: 7 days, Medium: 30 days, Low: 90 days), and exception management with risk acceptance sign-off. Subscribe to vendor security advisories. Conduct annual penetration testing. Track vulnerability trends and patch compliance metrics."},
+{id:"A.8.9",name:"Configuration management",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01, PR.PS-02",soc2:"CC6.1, CC7.1",cis:"CIS 4",pci:"Req 2",ce:"Secure Config",notes:"Establish security configuration baselines for all technology platforms using CIS Benchmarks or vendor hardening guides. Automate configuration deployment using infrastructure-as-code (Terraform, Ansible, GPO). Implement continuous configuration monitoring using CSPM (cloud) and compliance scanning tools. Detect and remediate configuration drift automatically. Disable unnecessary services, ports, and default accounts. Document and approve any deviations from baselines. Review baselines annually."},
+{id:"A.8.10",name:"Information deletion",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.5",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Implement automated data retention and deletion policies based on the retention schedule. Ensure deletion is irreversible — use cryptographic erasure for encrypted data, secure overwrite for unencrypted data. Extend deletion to all copies including backups, replicas, archives, and cloud storage. Address data in SaaS applications and third-party systems. Implement user-initiated deletion for data subject erasure requests (GDPR Article 17). Maintain deletion logs as evidence of compliance."},
+{id:"A.8.11",name:"Data masking",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1",cis:"CIS 3",pci:"Req 3",ce:"N/A",notes:"Implement data masking and pseudonymisation for non-production environments (development, testing, training, analytics). Use irreversible masking techniques for non-production data. Deploy dynamic data masking for production databases to restrict what users can see based on their role. Implement tokenisation for payment card data (PCI DSS compliance). Ensure masked data maintains referential integrity and statistical properties for valid testing. Document masking rules and regularly verify effectiveness."},
+{id:"A.8.12",name:"Data leakage prevention",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 3, CIS 13",pci:"Req 3",ce:"N/A",notes:"Deploy DLP controls across all data channels: endpoint DLP for USB/print/clipboard, email DLP for outbound sensitive data, cloud DLP for SaaS and cloud storage, and network DLP for web uploads. Define DLP policies based on data classification: monitor for Internal data, block for Confidential/Restricted data. Integrate with data classification labels. Tune policies to minimise false positives. Establish a DLP incident review process. Report DLP metrics to management monthly."},
+{id:"A.8.13",name:"Information backup",cat:"Technological",nistFunc:"RECOVER",nistCat:"RC.RP",nistSub:"RC.RP-02",soc2:"A1.2",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"Implement the 3-2-1-1-0 backup strategy: 3 copies of data, on 2 different media types, with 1 off-site copy, 1 offline/immutable copy (ransomware protection), and 0 errors after verification. Automate backup verification with integrity checks and test restores. Define backup schedules aligned with RPO requirements. Encrypt backups at rest and in transit. Test full system restoration at least annually. Document restore procedures with step-by-step runbooks. Monitor backup success/failure rates daily."},
+{id:"A.8.14",name:"Redundancy of information processing facilities",cat:"Technological",nistFunc:"RECOVER",nistCat:"RC.RP",nistSub:"RC.RP-02, RC.RP-03",soc2:"A1.2",cis:"CIS 11",pci:"Req 9",ce:"N/A",notes:"Implement redundancy at all critical layers: active-active or active-passive clusters for applications, database replication (synchronous for zero data loss, asynchronous for geo-redundancy), redundant network paths with automatic failover, and multi-region deployment for cloud workloads. Eliminate single points of failure for critical services. Test failover procedures at least annually. Monitor replication lag and failover health continuously. Document recovery procedures for each redundancy mechanism."},
+{id:"A.8.15",name:"Logging",cat:"Technological",nistFunc:"DETECT",nistCat:"DE.CM",nistSub:"DE.CM-01, DE.CM-09",soc2:"CC7.1, CC7.2",cis:"CIS 8",pci:"Req 10",ce:"N/A",notes:"Centralise log collection in a SIEM platform ingesting logs from all critical sources: authentication systems, firewalls, IDS/IPS, EDR, cloud platforms, applications, databases, and physical access systems. Define log retention periods: minimum 12 months online, longer in archive for compliance (PCI DSS requires 12 months). Protect log integrity using write-once storage or cryptographic hashing. Ensure logs include who, what, when, where, and outcome. Synchronise time sources across all systems."},
+{id:"A.8.16",name:"Monitoring activities",cat:"Technological",nistFunc:"DETECT",nistCat:"DE.CM",nistSub:"DE.CM-01, DE.CM-06",soc2:"CC7.2",cis:"CIS 8, CIS 13",pci:"Req 10, Req 11",ce:"N/A",notes:"Establish 24/7 security monitoring capability through an internal SOC or managed service (MSSP/MDR). Define detection use cases aligned with MITRE ATT&CK framework covering initial access, execution, persistence, privilege escalation, lateral movement, and data exfiltration. Implement automated alerting with defined response SLAs. Tune detection rules to reduce false positives. Conduct regular purple team exercises to validate detection coverage. Monitor for both external threats and insider risk indicators."},
+{id:"A.8.17",name:"Clock synchronisation",cat:"Technological",nistFunc:"DETECT",nistCat:"DE.CM",nistSub:"DE.CM-01",soc2:"CC7.1",cis:"CIS 8",pci:"Req 10",ce:"N/A",notes:"Configure all systems to synchronise time from authoritative NTP sources (e.g. NIST, NPL, GPS). Implement a tiered NTP architecture with redundant stratum-1 sources. Monitor for time drift and alert when synchronisation fails. Ensure all log timestamps use a consistent timezone format (UTC recommended). Time synchronisation is critical for log correlation, forensic investigations, and compliance with audit requirements. Document the NTP architecture and monitor source integrity."},
+{id:"A.8.18",name:"Use of privileged utility programs",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC6.1",cis:"CIS 4, CIS 6",pci:"Req 7",ce:"N/A",notes:"Restrict access to privileged utility programs (system tools, diagnostic utilities, registry editors, packet sniffers) to authorised administrators only. Implement application whitelisting to prevent execution of unauthorised tools. Log all usage of privileged utilities. Remove unnecessary utilities from production systems. Require management approval for installation of new administrative tools. Monitor for use of living-off-the-land binaries (LOLBins) that could indicate malicious activity."},
+{id:"A.8.19",name:"Installation of software on operational systems",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"CC6.1, CC6.8",cis:"CIS 2, CIS 4",pci:"Req 6",ce:"N/A",notes:"Implement a formal software installation policy: only authorised software from approved sources may be installed on operational systems. Maintain an approved software catalogue. Use application whitelisting or software restriction policies on production systems. Enforce code signing requirements for deployed software. Route all production deployments through CI/CD pipelines with security gates. Prohibit installation of software directly by end users on managed devices. Audit installed software regularly."},
+{id:"A.8.20",name:"Networks security",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 12, CIS 13",pci:"Req 1, Req 11",ce:"Firewalls",notes:"Implement network segmentation separating trust zones: internet-facing DMZ, internal user network, server/application tier, database tier, management network, and OT/IoT networks. Deploy next-generation firewalls with application-level inspection at zone boundaries. Implement IDS/IPS for threat detection. Monitor east-west traffic between segments, not just north-south. Conduct regular network architecture reviews. Document all firewall rules with business justification. Remove stale rules quarterly."},
+{id:"A.8.21",name:"Security of network services",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-02",soc2:"CC6.1, CC6.6",cis:"CIS 12, CIS 13",pci:"Req 1",ce:"Firewalls",notes:"Define security requirements for all network services including SLAs for availability, incident response, and patching. Conduct security assessments of managed network service providers. Implement encrypted transport (TLS 1.2+, IPsec) for all network services. Monitor service provider compliance with security requirements. Include security provisions in network service contracts. Regularly review network service architecture for security weaknesses."},
+{id:"A.8.22",name:"Segregation of networks",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-02",soc2:"CC6.6",cis:"CIS 12",pci:"Req 1",ce:"Firewalls",notes:"Implement microsegmentation to limit lateral movement: VLANs for broad segmentation, software-defined networking for granular control, and zero trust network access (ZTNA) for user-to-application connectivity. Isolate high-value assets (payment systems, databases with PII) in dedicated segments. Restrict inter-segment traffic to explicitly permitted flows. Monitor for unauthorised lateral movement using network detection and response (NDR) tools. Test segmentation effectiveness through penetration testing."},
+{id:"A.8.23",name:"Web filtering",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-02",soc2:"CC6.6, CC6.8",cis:"CIS 9",pci:"Req 1",ce:"N/A",notes:"Deploy web filtering to block access to known malicious sites, command-and-control infrastructure, and policy-violating content categories. Implement DNS filtering as an additional layer (e.g. Cisco Umbrella, Cloudflare Gateway). Enforce HTTPS inspection for visibility into encrypted traffic (with appropriate privacy safeguards). Block downloads of high-risk file types. Maintain URL categorisation exceptions with business justification. Monitor web filtering logs for indicators of compromise."},
+{id:"A.8.24",name:"Use of cryptography",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01, PR.DS-02",soc2:"CC6.1, CC6.7",cis:"CIS 3",pci:"Req 3, Req 4",ce:"N/A",notes:"Define a cryptographic policy specifying approved algorithms (AES-256 for symmetric, RSA-2048+ or ECC for asymmetric, SHA-256+ for hashing), key management procedures, and certificate lifecycle management. Encrypt all data at rest (full-disk, database, file-level as appropriate) and in transit (TLS 1.2+ minimum). Implement a hardware security module (HSM) or cloud KMS for key protection. Automate certificate management to prevent expiry. Plan for post-quantum cryptography migration."},
+{id:"A.8.25",name:"Secure development life cycle",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-06",soc2:"CC8.1",cis:"CIS 16",pci:"Req 6",ce:"N/A",notes:"Integrate security into every phase of the SDLC: threat modelling in design, secure coding standards in development (OWASP guidelines), static analysis (SAST) in build, dynamic testing (DAST) in staging, and penetration testing before production release. Implement security champions within development teams. Track security debt alongside technical debt. Require security review sign-off for all production releases. Provide regular secure development training for all developers."},
+{id:"A.8.26",name:"Application security requirements",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-06",soc2:"CC8.1",cis:"CIS 16",pci:"Req 6",ce:"N/A",notes:"Define application security requirements based on data sensitivity and exposure: input validation, output encoding, authentication and session management, access control, error handling, cryptographic controls, and API security. Incorporate OWASP Top 10 and ASVS (Application Security Verification Standard) as baseline requirements. Conduct threat modelling for all new applications and major changes. Require security acceptance criteria in user stories. Test security requirements as part of QA."},
+{id:"A.8.27",name:"Secure system architecture and engineering principles",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01, PR.PS-06",soc2:"CC8.1",cis:"CIS 4, CIS 16",pci:"Req 2, Req 6",ce:"Secure Config",notes:"Apply defence-in-depth and zero trust principles in system architecture: never trust, always verify; assume breach; least privilege access; microsegmentation; and end-to-end encryption. Document security architecture patterns and reference architectures. Review all new system designs against security architecture principles. Implement security architecture review as a gate in the project lifecycle. Maintain an enterprise security architecture diagram. Regularly assess architecture against emerging threats."},
+{id:"A.8.28",name:"Secure coding",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-06",soc2:"CC8.1",cis:"CIS 16",pci:"Req 6",ce:"N/A",notes:"Enforce secure coding standards based on OWASP guidelines: input validation and output encoding to prevent injection attacks, parameterised queries for database access, secure session management, proper error handling (no sensitive data in error messages), secure file upload handling, and protection against CSRF/SSRF. Implement automated SAST tools in CI/CD pipelines. Conduct peer code reviews with security focus. Provide developers with secure coding training annually."},
+{id:"A.8.29",name:"Security testing in development and acceptance",cat:"Technological",nistFunc:"IDENTIFY",nistCat:"ID.RA",nistSub:"ID.RA-01",soc2:"CC8.1",cis:"CIS 16",pci:"Req 6, Req 11",ce:"N/A",notes:"Implement a multi-layered security testing approach: SAST in CI/CD pipelines (every build), DAST in staging environments (every release), interactive application security testing (IAST) in QA, dependency scanning for vulnerable libraries (continuous), penetration testing for major releases and annually, and bug bounty programmes for externally-facing applications. Define security testing pass/fail criteria. Track and remediate findings before production deployment. Verify fixes through re-testing."},
+{id:"A.8.30",name:"Outsourced development",cat:"Technological",nistFunc:"GOVERN",nistCat:"GV.SC",nistSub:"GV.SC-05, GV.SC-07",soc2:"CC9.2",cis:"CIS 15, CIS 16",pci:"Req 6",ce:"N/A",notes:"Include comprehensive security requirements in outsourced development contracts: adherence to secure coding standards, security testing requirements, code review processes, intellectual property ownership, source code escrow, vulnerability management obligations, and right to conduct security assessments. Require developers to undergo security training. Review third-party code before integration. Implement software composition analysis to identify vulnerable dependencies in third-party code."},
+{id:"A.8.31",name:"Separation of dev, test and production environments",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1, CC8.1",cis:"CIS 4, CIS 16",pci:"Req 6",ce:"N/A",notes:"Maintain strictly separated environments for development, testing/staging, and production. Prohibit use of production data in non-production environments — use masked or synthetic data instead. Implement separate credentials and access controls for each environment. Restrict production access to authorised operations staff only. Use infrastructure-as-code to ensure environment parity while maintaining isolation. Monitor for configuration drift between environments. Audit cross-environment access regularly."},
+{id:"A.8.32",name:"Change management",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"CC8.1",cis:"CIS 4",pci:"Req 6.5",ce:"N/A",notes:"Implement a formal change management process: RFC submission with business justification and security impact assessment, risk categorisation (standard, normal, emergency), CAB review for normal and significant changes, testing and rollback plan documentation, deployment window scheduling, post-implementation verification, and documentation update. Track all changes in a change management system. Audit emergency changes retrospectively. Monitor for unauthorised changes through configuration monitoring."},
+{id:"A.8.33",name:"Test information",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1",cis:"CIS 3, CIS 16",pci:"Req 6",ce:"N/A",notes:"Prohibit the use of production data in test environments. Generate realistic test data using data masking, synthetic data generation, or pseudonymisation tools. Ensure test data maintains referential integrity and edge cases for valid testing. Apply the same classification and protection controls to test data as to the source data if masking is not applied. Securely destroy test data after use. Document test data handling procedures. Audit compliance with test data policies."},
+{id:"A.8.34",name:"Protection of info systems during audit testing",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC4.1",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Plan audit testing activities to minimise disruption to production systems and business operations. Schedule intensive testing (e.g. penetration tests, performance tests) during maintenance windows or low-activity periods. Restrict auditor access to the minimum required — use read-only access where possible. Monitor auditor activities during testing. Ensure audit tools are approved and do not introduce vulnerabilities. Obtain sign-off from system owners before audit testing. Back up systems before destructive testing."}
 ];
 
-const EXAMPLE_SEARCHES = [
-  { text: "MFA", desc: "Multi-factor authentication" },
-  { text: "A.5.17", desc: "Specific ISO control" },
-  { text: "CC6.1", desc: "SOC 2 criteria" },
-  { text: "CIS 5", desc: "CIS Control 5" },
-  { text: "encryption", desc: "Cryptography controls" },
-  { text: "access control", desc: "Access management" },
-  { text: "incident", desc: "Incident management" },
-  { text: "backup", desc: "Data protection" }
-];
+var EXAMPLE_SEARCHES=[{text:"MFA",desc:"Multi-factor authentication"},{text:"A.5.17",desc:"Specific ISO control"},{text:"CC6.1",desc:"SOC 2 criteria"},{text:"CIS 5",desc:"CIS Control 5"},{text:"encryption",desc:"Cryptography controls"},{text:"access control",desc:"Access management"},{text:"incident",desc:"Incident management"},{text:"backup",desc:"Data protection"}];
 
-const FC = {GOVERN:"#F59E0B",IDENTIFY:"#10B981",PROTECT:"#3B82F6",DETECT:"#8B5CF6",RESPOND:"#EF4444",RECOVER:"#06B6D4"};
-const CC = {Organizational:"#3B82F6",People:"#10B981",Physical:"#F59E0B",Technological:"#8B5CF6"};
+var FC={GOVERN:"#F59E0B",IDENTIFY:"#10B981",PROTECT:"#3B82F6",DETECT:"#8B5CF6",RESPOND:"#EF4444",RECOVER:"#06B6D4"};
+var CC_COL={Organizational:"#3B82F6",People:"#10B981",Physical:"#F59E0B",Technological:"#8B5CF6"};
 
-function Tag({text,color}){return e("span",{style:{display:"inline-block",padding:"2px 8px",borderRadius:4,fontSize:11,fontWeight:600,background:color+"18",color,border:"1px solid "+color+"30",marginRight:4,marginBottom:2,whiteSpace:"nowrap"}},text)}
+function splitRefs(s){return s.split(",").map(function(r){return r.trim()}).filter(function(r){return r&&r!=="N/A"})}
 
-function TutorialModal({onClose}) {
-  return e("div", {
-    className: "tutorial-modal",
-    style: {
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: "rgba(8, 14, 24, 0.95)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 1000,
-      padding: 20
-    }
-  },
-    e("div", {
-      style: {
-        background: "#0d1520",
-        border: "1px solid #1e2d3d",
-        borderRadius: 12,
-        padding: "24px 28px",
-        maxWidth: 500,
-        width: "100%"
-      }
-    },
-      e("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 20 } },
-        e("span", { style: { fontSize: 24 } }, "🎯"),
-        e("h2", { style: { fontSize: 20, fontWeight: 700, color: "#fff", margin: 0 } }, "Quick Tour")
+function Tag(p){return e("span",{style:{display:"inline-block",padding:"2px 8px",borderRadius:4,fontSize:11,fontWeight:600,background:p.color+"18",color:p.color,border:"1px solid "+p.color+"30",marginRight:4,marginBottom:2,whiteSpace:"nowrap"}},p.text)}
+
+function FwSection(p){
+  var items=splitRefs(p.refs);
+  if(items.length===0)return e("div",{style:{marginBottom:12}},e("div",{style:{fontSize:10,fontWeight:700,color:"#4a5568",textTransform:"uppercase",letterSpacing:1,marginBottom:4}},p.title),e("div",{style:{fontSize:12,color:"#3a4a5a",fontStyle:"italic"}},"Not applicable"));
+  return e("div",{style:{marginBottom:14}},
+    e("div",{style:{fontSize:10,fontWeight:700,color:p.color||"#4a5568",textTransform:"uppercase",letterSpacing:1,marginBottom:6}},p.title),
+    items.map(function(ref){var desc=p.lookup[ref]||"";return e("div",{key:ref,style:{marginBottom:6,paddingLeft:10,borderLeft:"2px solid "+(p.color||"#1e2d3d")+"40"}},e("div",{style:{fontFamily:"'JetBrains Mono',monospace",fontSize:12,color:"#00d4aa",fontWeight:600}},ref),desc&&e("div",{style:{fontSize:12,color:"#8a9ab0",lineHeight:1.4,marginTop:1}},desc))})
+  );
+}
+
+function TutorialModal(p){
+  return e("div",{className:"tutorial-modal",style:{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(8,14,24,0.95)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:1000,padding:20}},
+    e("div",{style:{background:"#0d1520",border:"1px solid #1e2d3d",borderRadius:12,padding:"24px 28px",maxWidth:500,width:"100%"}},
+      e("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:20}},e("span",{style:{fontSize:24}},"\uD83C\uDFAF"),e("h2",{style:{fontSize:20,fontWeight:700,color:"#fff",margin:0}},"Quick Tour")),
+      e("div",{style:{marginBottom:20,lineHeight:1.6}},
+        e("div",{style:{marginBottom:16}},e("div",{style:{fontWeight:600,color:"#00d4aa",marginBottom:4}},"\uD83D\uDD0D Search Anything"),e("div",{style:{color:"#a0aec0",fontSize:14}},"Control IDs (A.5.2), framework refs (CC6.1, CIS 5), or keywords (MFA, encryption)")),
+        e("div",{style:{marginBottom:16}},e("div",{style:{fontWeight:600,color:"#00d4aa",marginBottom:4}},"\uD83C\uDFF7\uFE0F Smart Filters"),e("div",{style:{color:"#a0aec0",fontSize:14}},"Filter by ISO category or NIST function to narrow results")),
+        e("div",{style:{marginBottom:16}},e("div",{style:{fontWeight:600,color:"#00d4aa",marginBottom:4}},"\uD83D\uDCCB Full Control Descriptions"),e("div",{style:{color:"#a0aec0",fontSize:14}},"Expand any control to see full requirement text for every mapped framework")),
+        e("div",{},e("div",{style:{fontWeight:600,color:"#00d4aa",marginBottom:4}},"\uD83D\uDCCA Live Stats"),e("div",{style:{color:"#a0aec0",fontSize:14}},"Control counts update in real-time as you filter"))
       ),
-      e("div", { style: { marginBottom: 20, lineHeight: 1.6 } },
-        e("div", { style: { marginBottom: 16 } },
-          e("div", { style: { fontWeight: 600, color: "#00d4aa", marginBottom: 4 } }, "🔍 Search Anything"),
-          e("div", { style: { color: "#a0aec0", fontSize: 14 } }, "Control IDs (A.5.2), framework refs (CC6.1, CIS 5), or keywords (MFA, encryption)")
-        ),
-        e("div", { style: { marginBottom: 16 } },
-          e("div", { style: { fontWeight: 600, color: "#00d4aa", marginBottom: 4 } }, "🏷️ Smart Filters"),
-          e("div", { style: { color: "#a0aec0", fontSize: 14 } }, "Filter by ISO category or NIST function to narrow results")
-        ),
-        e("div", { style: { marginBottom: 16 } },
-          e("div", { style: { fontWeight: 600, color: "#00d4aa", marginBottom: 4 } }, "📋 Expand Controls"),
-          e("div", { style: { color: "#a0aec0", fontSize: 14 } }, "Click any control card to see full framework mappings and implementation notes")
-        ),
-        e("div", {},
-          e("div", { style: { fontWeight: 600, color: "#00d4aa", marginBottom: 4 } }, "📊 Live Stats"),
-          e("div", { style: { color: "#a0aec0", fontSize: 14 } }, "Control counts update in real-time as you filter")
-        )
-      ),
-      e("div", { style: { textAlign: "right" } },
-        e("button", {
-          onClick: onClose,
-          style: {
-            padding: "8px 18px",
-            borderRadius: 6,
-            border: "1px solid #00d4aa",
-            background: "#00d4aa18",
-            color: "#00d4aa",
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: "pointer"
-          }
-        }, "Got it!")
-      )
+      e("div",{style:{textAlign:"right"}},e("button",{onClick:p.onClose,style:{padding:"8px 18px",borderRadius:6,border:"1px solid #00d4aa",background:"#00d4aa18",color:"#00d4aa",fontSize:14,fontWeight:600,cursor:"pointer"}},"Got it!"))
     )
   );
 }
 
-function ExampleSearches({onSearchClick, search}) {
-  if (search.length > 0) return null;
-  
-  return e("div", { style: { marginBottom: 16 } },
-    e("div", { style: { fontSize: 12, color: "#4a5568", fontWeight: 600, marginBottom: 8 } }, "💡 Try these searches:"),
-    e("div", { style: { display: "flex", gap: 6, flexWrap: "wrap" } },
-      EXAMPLE_SEARCHES.map(ex => 
-        e("button", {
-          key: ex.text,
-          className: "example-search",
-          onClick: () => onSearchClick(ex.text),
-          style: {
-            padding: "4px 10px",
-            borderRadius: 16,
-            border: "1px solid #1e2d3d",
-            background: "#0d1520",
-            color: "#a0aec0",
-            fontSize: 12,
-            cursor: "pointer",
-            whiteSpace: "nowrap"
-          }
-        }, ex.text)
-      )
-    )
+function ExampleSearches(p){
+  if(p.search.length>0)return null;
+  return e("div",{style:{marginBottom:16}},
+    e("div",{style:{fontSize:12,color:"#4a5568",fontWeight:600,marginBottom:8}},"\uD83D\uDCA1 Try these searches:"),
+    e("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},EXAMPLE_SEARCHES.map(function(ex){return e("button",{key:ex.text,className:"example-search",onClick:function(){p.onSearchClick(ex.text)},style:{padding:"4px 10px",borderRadius:16,border:"1px solid #1e2d3d",background:"#0d1520",color:"#a0aec0",fontSize:12,cursor:"pointer",whiteSpace:"nowrap"}},ex.text)}))
   );
 }
 
-function SearchWithAutocomplete({search, setSearch, onSearchClick}) {
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  
-  const generateSuggestions = useCallback((query) => {
-    if (!query || query.length < 2) return [];
-    
-    const q = query.toLowerCase();
-    const matches = [];
-    
-    CONTROLS.forEach(c => {
-      if (c.id.toLowerCase().includes(q)) matches.push({ type: "Control ID", text: c.id, desc: c.name });
-      else if (c.name.toLowerCase().includes(q)) matches.push({ type: "Control", text: c.name.slice(0, 40) + (c.name.length > 40 ? "..." : ""), desc: c.id });
-      else if (c.soc2.toLowerCase().includes(q)) matches.push({ type: "SOC 2", text: c.soc2.split(",")[0].trim(), desc: c.id + " - " + c.name.slice(0, 30) });
-      else if (c.cis.toLowerCase().includes(q)) matches.push({ type: "CIS", text: c.cis.split(",")[0].trim(), desc: c.id + " - " + c.name.slice(0, 30) });
-      else if (c.nistCat.toLowerCase().includes(q)) matches.push({ type: "NIST", text: c.nistCat, desc: c.id + " - " + c.name.slice(0, 30) });
+function SearchBox(p){
+  var _su=useState([]),sug=_su[0],setSug=_su[1];
+  var _sh=useState(false),show=_sh[0],setShow=_sh[1];
+  var gen=useCallback(function(q){
+    if(!q||q.length<2)return[];var ql=q.toLowerCase(),m=[];
+    CONTROLS.forEach(function(c){
+      if(c.id.toLowerCase().includes(ql))m.push({type:"Control ID",text:c.id,desc:c.name});
+      else if(c.name.toLowerCase().includes(ql))m.push({type:"Control",text:c.name.slice(0,40)+(c.name.length>40?"...":""),desc:c.id});
+      else if(c.soc2.toLowerCase().includes(ql))m.push({type:"SOC 2",text:c.soc2.split(",")[0].trim(),desc:c.id+" - "+c.name.slice(0,30)});
+      else if(c.cis.toLowerCase().includes(ql))m.push({type:"CIS",text:c.cis.split(",")[0].trim(),desc:c.id+" - "+c.name.slice(0,30)});
+      else if(c.nistCat.toLowerCase().includes(ql))m.push({type:"NIST",text:c.nistCat,desc:c.id+" - "+c.name.slice(0,30)});
     });
-    
-    // Add keyword suggestions
-    const keywords = ["MFA", "encryption", "access control", "incident", "backup", "authentication", "malware", "vulnerability", "logging", "monitoring"];
-    keywords.forEach(kw => {
-      if (kw.toLowerCase().includes(q)) matches.push({ type: "Keyword", text: kw, desc: "Search for controls related to " + kw });
-    });
-    
-    return [...new Map(matches.map(m => [m.text, m])).values()].slice(0, 8);
-  }, []);
-  
-  useEffect(() => {
-    const newSuggestions = generateSuggestions(search);
-    setSuggestions(newSuggestions);
-    setShowSuggestions(newSuggestions.length > 0 && search.length >= 2);
-  }, [search, generateSuggestions]);
-  
-  const handleSuggestionClick = (suggestion) => {
-    setSearch(suggestion.text);
-    setShowSuggestions(false);
-  };
-  
-  return e("div", { style: { position: "relative", marginBottom: 14 } },
-    e("input", {
-      type: "text",
-      value: search,
-      onChange: (ev) => setSearch(ev.target.value),
-      onBlur: () => setTimeout(() => setShowSuggestions(false), 150),
-      onFocus: () => setSuggestions(generateSuggestions(search)),
-      placeholder: "Search controls, frameworks, keywords (e.g. MFA, CC6.1, CIS 5, access)...",
-      style: {
-        width: "100%",
-        padding: "12px 16px",
-        borderRadius: 8,
-        border: "1px solid #1e2d3d",
-        background: "#0d1520",
-        color: "#e2e8f0",
-        fontSize: 14,
-        outline: "none",
-        boxSizing: "border-box",
-        fontFamily: "inherit"
-      }
-    }),
-    showSuggestions && e("div", {
-      className: "autocomplete-dropdown",
-      style: {
-        position: "absolute",
-        top: "100%",
-        left: 0,
-        right: 0,
-        background: "#0d1520",
-        border: "1px solid #1e2d3d",
-        borderTop: "none",
-        borderRadius: "0 0 8px 8px",
-        zIndex: 100,
-        maxHeight: 200,
-        overflow: "auto"
-      }
-    },
-      suggestions.map((suggestion, i) =>
-        e("div", {
-          key: i,
-          onClick: () => handleSuggestionClick(suggestion),
-          style: {
-            padding: "8px 12px",
-            cursor: "pointer",
-            borderBottom: i < suggestions.length - 1 ? "1px solid #1a2a3a" : "none",
-            transition: "background 0.15s"
-          },
-          onMouseEnter: (ev) => ev.target.style.background = "#1a2a3a",
-          onMouseLeave: (ev) => ev.target.style.background = "transparent"
-        },
-          e("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } },
-            e("div", {},
-              e("span", { style: { color: "#00d4aa", fontSize: 13, fontWeight: 600 } }, suggestion.text),
-              e("div", { style: { color: "#4a5568", fontSize: 11, marginTop: 2 } }, suggestion.desc)
-            ),
-            e("span", { style: { fontSize: 10, color: "#4a5568", fontWeight: 600, textTransform: "uppercase" } }, suggestion.type)
-          )
-        )
-      )
-    ),
-    e(ExampleSearches, { onSearchClick, search })
+    ["MFA","encryption","access control","incident","backup","authentication","malware","vulnerability","logging","monitoring"].forEach(function(kw){if(kw.toLowerCase().includes(ql))m.push({type:"Keyword",text:kw,desc:"Controls related to "+kw})});
+    return Array.from(new Map(m.map(function(x){return[x.text,x]})).values()).slice(0,8);
+  },[]);
+  useEffect(function(){var ns=gen(p.search);setSug(ns);setShow(ns.length>0&&p.search.length>=2)},[p.search,gen]);
+  return e("div",{style:{position:"relative",marginBottom:14}},
+    e("input",{type:"text",value:p.search,onChange:function(ev){p.setSearch(ev.target.value)},onBlur:function(){setTimeout(function(){setShow(false)},150)},onFocus:function(){setSug(gen(p.search))},placeholder:"Search controls, frameworks, keywords (e.g. MFA, CC6.1, CIS 5, access)...",style:{width:"100%",padding:"12px 16px",borderRadius:8,border:"1px solid #1e2d3d",background:"#0d1520",color:"#e2e8f0",fontSize:14,outline:"none",boxSizing:"border-box",fontFamily:"inherit"}}),
+    show&&e("div",{className:"autocomplete-dropdown",style:{position:"absolute",top:"100%",left:0,right:0,background:"#0d1520",border:"1px solid #1e2d3d",borderTop:"none",borderRadius:"0 0 8px 8px",zIndex:100,maxHeight:200,overflow:"auto"}},sug.map(function(s,i){return e("div",{key:i,onClick:function(){p.setSearch(s.text);setShow(false)},style:{padding:"8px 12px",cursor:"pointer",borderBottom:i<sug.length-1?"1px solid #1a2a3a":"none"},onMouseEnter:function(ev){ev.currentTarget.style.background="#1a2a3a"},onMouseLeave:function(ev){ev.currentTarget.style.background="transparent"}},e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},e("div",{},e("span",{style:{color:"#00d4aa",fontSize:13,fontWeight:600}},s.text),e("div",{style:{color:"#4a5568",fontSize:11,marginTop:2}},s.desc)),e("span",{style:{fontSize:10,color:"#4a5568",fontWeight:600,textTransform:"uppercase"}},s.type)))})),
+    e(ExampleSearches,{onSearchClick:p.onSearchClick,search:p.search})
   );
 }
 
-function ControlCard({c,expanded,onToggle}){
-  return e("div",{className:"control-card",onClick:onToggle,style:{background:"#0d1520",border:"1px solid #1e2d3d",borderRadius:8,padding:"14px 18px",cursor:"pointer",borderLeft:"3px solid "+FC[c.nistFunc]}},
+function ControlCard(p){
+  var c=p.c;
+  return e("div",{className:"control-card",onClick:p.onToggle,style:{background:"#0d1520",border:"1px solid #1e2d3d",borderRadius:8,padding:"14px 18px",cursor:"pointer",borderLeft:"3px solid "+FC[c.nistFunc]}},
     e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12}},
       e("div",{style:{flex:1,minWidth:0}},
         e("div",{style:{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:6}},
           e("span",{style:{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:"#00d4aa",fontSize:14}},c.id),
-          e(Tag,{text:c.cat,color:CC[c.cat]}),
+          e(Tag,{text:c.cat,color:CC_COL[c.cat]}),
           e(Tag,{text:c.nistFunc,color:FC[c.nistFunc]})
         ),
         e("div",{style:{color:"#e2e8f0",fontSize:14,fontWeight:500,lineHeight:1.4}},c.name)
       ),
-      e("span",{style:{color:"#4a5568",fontSize:18,flexShrink:0,marginTop:2}},expanded?"\u2212":"+")
+      e("span",{style:{color:"#4a5568",fontSize:18,flexShrink:0,marginTop:2}},p.expanded?"\u2212":"+")
     ),
-    expanded && e("div",{className:"expand-content",style:{marginTop:14,paddingTop:14,borderTop:"1px solid #1e2d3d"}},
-      e("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px 24px"}},
-        [["NIST CSF 2.0",c.nistCat+" \u2192 "+c.nistSub],["SOC 2 TSC",c.soc2],["CIS Controls v8",c.cis],["PCI DSS 4.0",c.pci],["Cyber Essentials",c.ce]].map(function(pair){
-          return e("div",{key:pair[0]},
-            e("div",{style:{fontSize:10,fontWeight:700,color:"#4a5568",textTransform:"uppercase",letterSpacing:1,marginBottom:2}},pair[0]),
-            e("div",{style:{fontSize:13,color:pair[1]==="N/A"?"#4a5568":"#a0aec0",fontFamily:"'JetBrains Mono',monospace"}},pair[1])
-          )
-        })
-      ),
+    p.expanded&&e("div",{className:"expand-content",onClick:function(ev){ev.stopPropagation()},style:{marginTop:14,paddingTop:14,borderTop:"1px solid #1e2d3d"}},
+      e(FwSection,{title:"NIST CSF 2.0",refs:c.nistSub,lookup:NIST_DESC,color:FC[c.nistFunc]}),
+      e(FwSection,{title:"SOC 2 Trust Services Criteria",refs:c.soc2,lookup:SOC2_DESC,color:"#EF4444"}),
+      e(FwSection,{title:"CIS Controls v8",refs:c.cis,lookup:CIS_DESC,color:"#10B981"}),
+      e(FwSection,{title:"PCI DSS 4.0",refs:c.pci,lookup:PCI_DESC,color:"#F59E0B"}),
+      e(FwSection,{title:"Cyber Essentials",refs:c.ce,lookup:CE_DESC,color:"#06B6D4"}),
       e("div",{style:{marginTop:12,padding:"8px 12px",background:"#0a1929",borderRadius:6,border:"1px solid #1a2a3a"}},
         e("div",{style:{fontSize:10,fontWeight:700,color:"#00d4aa",textTransform:"uppercase",letterSpacing:1,marginBottom:2}},"Implementation Guidance"),
         e("div",{style:{fontSize:13,color:"#a0aec0",lineHeight:1.5}},c.notes)
       )
     )
-  )
+  );
 }
 
-function Pill({label,active,onClick,color}){
-  return e("button",{onClick:onClick,style:{padding:"5px 14px",borderRadius:20,border:active?"1px solid "+(color||"#00d4aa"):"1px solid #1e2d3d",background:active?(color||"#00d4aa")+"18":"transparent",color:active?(color||"#00d4aa"):"#4a5568",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all 0.15s",whiteSpace:"nowrap"}},label)
-}
+function Pill(p){return e("button",{onClick:p.onClick,style:{padding:"5px 14px",borderRadius:20,border:p.active?"1px solid "+(p.color||"#00d4aa"):"1px solid #1e2d3d",background:p.active?(p.color||"#00d4aa")+"18":"transparent",color:p.active?(p.color||"#00d4aa"):"#4a5568",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap"}},p.label)}
 
 function App(){
   var _s=useState(""),search=_s[0],setSearch=_s[1];
-  var _c=useState("All"),catFilter=_c[0],setCatFilter=_c[1];
-  var _f=useState("All"),funcFilter=_f[0],setFuncFilter=_f[1];
-  var _e=useState(null),expanded=_e[0],setExpanded=_e[1];
-  var _t=useState(false),showTutorial=_t[0],setShowTutorial=_t[1];
-  
-  // Show tutorial on first visit
-  useEffect(() => {
-    if (!localStorage.getItem('grc-tool-visited')) {
-      setShowTutorial(true);
-      localStorage.setItem('grc-tool-visited', 'true');
-    }
-  }, []);
+  var _c=useState("All"),catF=_c[0],setCatF=_c[1];
+  var _f=useState("All"),funcF=_f[0],setFuncF=_f[1];
+  var _soc=useState("All"),socF=_soc[0],setSocF=_soc[1];
+  var _cis=useState("All"),cisF=_cis[0],setCisF=_cis[1];
+  var _pci=useState("All"),pciF=_pci[0],setPciF=_pci[1];
+  var _ce=useState("All"),ceF=_ce[0],setCeF=_ce[1];
+  var _e2=useState(null),exp=_e2[0],setExp=_e2[1];
+  var _t=useState(false),showT=_t[0],setShowT=_t[1];
+
+  useEffect(function(){try{if(!localStorage.getItem("grc-v2")){setShowT(true);localStorage.setItem("grc-v2","1")}}catch(e){setShowT(true)}},[]);
 
   var filtered=useMemo(function(){
     var q=search.toLowerCase();
     return CONTROLS.filter(function(c){
-      if(catFilter!=="All"&&c.cat!==catFilter)return false;
-      if(funcFilter!=="All"&&c.nistFunc!==funcFilter)return false;
+      if(catF!=="All"&&c.cat!==catF)return false;
+      if(funcF!=="All"&&c.nistFunc!==funcF)return false;
+      if(socF!=="All"){var sr=c.soc2.split(",").map(function(x){return x.trim()});if(!sr.some(function(x){return x.indexOf(socF)===0}))return false}
+      if(cisF!=="All"){var cr=c.cis.split(",").map(function(x){return x.trim()});if(!cr.some(function(x){return x===cisF}))return false}
+      if(pciF!=="All"){var pr=c.pci.split(",").map(function(x){return x.trim()});if(!pr.some(function(x){return x===pciF||x.indexOf(pciF+".")===0}))return false}
+      if(ceF!=="All"&&c.ce!==ceF)return false;
       if(!q)return true;
       return[c.id,c.name,c.nistCat,c.nistSub,c.soc2,c.cis,c.pci,c.ce,c.notes].some(function(v){return v.toLowerCase().includes(q)});
     });
-  },[search,catFilter,funcFilter]);
+  },[search,catF,funcF,socF,cisF,pciF,ceF]);
 
-  var stats=useMemo(function(){
-    return{total:filtered.length,funcs:Object.keys(FC).map(function(f){return{name:f,count:filtered.filter(function(c){return c.nistFunc===f}).length}})};
-  },[filtered]);
-
-  const handleExampleSearch = (searchText) => {
-    setSearch(searchText);
-  };
+  var stats=useMemo(function(){return{total:filtered.length,funcs:Object.keys(FC).map(function(f){return{name:f,count:filtered.filter(function(c){return c.nistFunc===f}).length}})}},[filtered]);
 
   return e("div",{style:{minHeight:"100vh",background:"#080e18",color:"#e2e8f0",fontFamily:"'DM Sans','Segoe UI',sans-serif"}},
-    showTutorial && e(TutorialModal, { onClose: () => setShowTutorial(false) }),
+    showT&&e(TutorialModal,{onClose:function(){setShowT(false)}}),
     e("div",{style:{maxWidth:720,margin:"0 auto",padding:"24px 16px"}},
       e("div",{style:{marginBottom:28}},
         e("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}},
-          e("div",{style:{display:"flex",alignItems:"center",gap:10}},
-            e("span",{style:{fontSize:22}},"\uD83D\uDEE1"),
-            e("h1",{style:{fontSize:22,fontWeight:800,color:"#fff",margin:0}},"InfoSec Controls Cross-Reference")
-          ),
-          e("button",{
-            onClick:()=>setShowTutorial(true),
-            style:{padding:"4px 12px",borderRadius:16,border:"1px solid #1e2d3d",background:"transparent",color:"#4a5568",fontSize:11,fontWeight:600,cursor:"pointer"}
-          },"? Help")
+          e("div",{style:{display:"flex",alignItems:"center",gap:10}},e("span",{style:{fontSize:22}},"\uD83D\uDEE1"),e("h1",{style:{fontSize:22,fontWeight:800,color:"#fff",margin:0}},"InfoSec Controls Cross-Reference")),
+          e("button",{onClick:function(){setShowT(true)},style:{padding:"4px 12px",borderRadius:16,border:"1px solid #1e2d3d",background:"transparent",color:"#4a5568",fontSize:11,fontWeight:600,cursor:"pointer"}},"? Help")
         ),
         e("p",{style:{color:"#4a5568",fontSize:13,margin:"4px 0 0"}},"ISO 27001:2022 \u2192 NIST CSF 2.0 \u00B7 SOC 2 \u00B7 CIS v8 \u00B7 PCI DSS \u00B7 Cyber Essentials")
       ),
-      e(SearchWithAutocomplete, { search, setSearch, onSearchClick: handleExampleSearch }),
+      e(SearchBox,{search:search,setSearch:setSearch,onSearchClick:function(t){setSearch(t)}}),
+      (catF!=="All"||funcF!=="All"||socF!=="All"||cisF!=="All"||pciF!=="All"||ceF!=="All")&&e("div",{style:{marginBottom:10}},e("button",{onClick:function(){setCatF("All");setFuncF("All");setSocF("All");setCisF("All");setPciF("All");setCeF("All")},style:{padding:"4px 14px",borderRadius:16,border:"1px solid #EF444460",background:"#EF444412",color:"#EF4444",fontSize:11,fontWeight:600,cursor:"pointer"}},"✕ Clear all filters")),
       e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}},
         e("span",{style:{fontSize:11,color:"#4a5568",fontWeight:600,alignSelf:"center",marginRight:4}},"ISO Category:"),
-        ["All","Organizational","People","Physical","Technological"].map(function(c){return e(Pill,{key:c,label:c,active:catFilter===c,onClick:function(){setCatFilter(c)},color:CC[c]})})
+        ["All","Organizational","People","Physical","Technological"].map(function(c){return e(Pill,{key:c,label:c,active:catF===c,onClick:function(){setCatF(c)},color:CC_COL[c]})})
+      ),
+      e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}},
+        e("span",{style:{fontSize:11,color:"#4a5568",fontWeight:600,alignSelf:"center",marginRight:4}},"NIST Function:"),
+        ["All","GOVERN","IDENTIFY","PROTECT","DETECT","RESPOND","RECOVER"].map(function(f){return e(Pill,{key:f,label:f,active:funcF===f,onClick:function(){setFuncF(f)},color:FC[f]})})
+      ),
+      e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}},
+        e("span",{style:{fontSize:11,color:"#EF4444",fontWeight:600,alignSelf:"center",marginRight:4}},"SOC 2:"),
+        ["All","CC1","CC2","CC3","CC4","CC5","CC6","CC7","CC8","CC9","A1","P1"].map(function(s){return e(Pill,{key:s,label:s,active:socF===s,onClick:function(){setSocF(s)},color:"#EF4444"})})
+      ),
+      e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}},
+        e("span",{style:{fontSize:11,color:"#10B981",fontWeight:600,alignSelf:"center",marginRight:4}},"CIS v8:"),
+        ["All"].concat(Array.from({length:18},function(_,i){return"CIS "+(i+1)})).map(function(c){return e(Pill,{key:c,label:c==="All"?c:c.replace("CIS ",""),active:cisF===c,onClick:function(){setCisF(c)},color:"#10B981"})})
+      ),
+      e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}},
+        e("span",{style:{fontSize:11,color:"#F59E0B",fontWeight:600,alignSelf:"center",marginRight:4}},"PCI DSS:"),
+        ["All"].concat(Array.from({length:12},function(_,i){return"Req "+(i+1)})).map(function(r){return e(Pill,{key:r,label:r==="All"?r:r.replace("Req ",""),active:pciF===r,onClick:function(){setPciF(r)},color:"#F59E0B"})})
       ),
       e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:18}},
-        e("span",{style:{fontSize:11,color:"#4a5568",fontWeight:600,alignSelf:"center",marginRight:4}},"NIST Function:"),
-        ["All","GOVERN","IDENTIFY","PROTECT","DETECT","RESPOND","RECOVER"].map(function(f){return e(Pill,{key:f,label:f,active:funcFilter===f,onClick:function(){setFuncFilter(f)},color:FC[f]})})
+        e("span",{style:{fontSize:11,color:"#06B6D4",fontWeight:600,alignSelf:"center",marginRight:4}},"Cyber Essentials:"),
+        ["All","Access Control","Secure Config","Firewalls","Malware Protection","Security Updates"].map(function(c){return e(Pill,{key:c,label:c,active:ceF===c,onClick:function(){setCeF(c)},color:"#06B6D4"})})
       ),
       e("div",{style:{display:"flex",gap:8,marginBottom:18,flexWrap:"wrap"}},
-        stats.funcs.filter(function(f){return f.count>0}).map(function(f){
-          return e("div",{key:f.name,style:{padding:"6px 12px",borderRadius:6,background:FC[f.name]+"12",border:"1px solid "+FC[f.name]+"25",textAlign:"center"}},
-            e("div",{style:{fontSize:18,fontWeight:800,color:FC[f.name]}},f.count),
-            e("div",{style:{fontSize:9,fontWeight:700,color:FC[f.name],opacity:0.7,textTransform:"uppercase",letterSpacing:0.5}},f.name)
-          )
-        }),
-        e("div",{style:{padding:"6px 12px",borderRadius:6,background:"#00d4aa12",border:"1px solid #00d4aa25",textAlign:"center"}},
-          e("div",{style:{fontSize:18,fontWeight:800,color:"#00d4aa"}},stats.total),
-          e("div",{style:{fontSize:9,fontWeight:700,color:"#00d4aa",opacity:0.7,textTransform:"uppercase",letterSpacing:0.5}},"Total")
-        )
+        stats.funcs.filter(function(f){return f.count>0}).map(function(f){return e("div",{key:f.name,style:{padding:"6px 12px",borderRadius:6,background:FC[f.name]+"12",border:"1px solid "+FC[f.name]+"25",textAlign:"center"}},e("div",{style:{fontSize:18,fontWeight:800,color:FC[f.name]}},f.count),e("div",{style:{fontSize:9,fontWeight:700,color:FC[f.name],opacity:0.7,textTransform:"uppercase",letterSpacing:.5}},f.name))}),
+        e("div",{style:{padding:"6px 12px",borderRadius:6,background:"#00d4aa12",border:"1px solid #00d4aa25",textAlign:"center"}},e("div",{style:{fontSize:18,fontWeight:800,color:"#00d4aa"}},stats.total),e("div",{style:{fontSize:9,fontWeight:700,color:"#00d4aa",opacity:0.7,textTransform:"uppercase",letterSpacing:.5}},"Total"))
       ),
       e("div",{style:{display:"flex",flexDirection:"column",gap:8}},
         filtered.length===0&&e("div",{style:{textAlign:"center",padding:40,color:"#4a5568"}},"No controls match your search."),
-        filtered.map(function(c){return e(ControlCard,{key:c.id,c:c,expanded:expanded===c.id,onToggle:function(){setExpanded(expanded===c.id?null:c.id)}})})
+        filtered.map(function(c){return e(ControlCard,{key:c.id,c:c,expanded:exp===c.id,onToggle:function(){setExp(exp===c.id?null:c.id)}})})
       ),
-      e("div",{style:{marginTop:32,paddingTop:16,borderTop:"1px solid #1e2d3d",textAlign:"center",color:"#2d3748",fontSize:11}},
-        "ISO 27001:2022 \u00B7 NIST CSF 2.0 \u00B7 SOC 2 2022 \u00B7 CIS v8 \u00B7 PCI DSS 4.0 \u00B7 Cyber Essentials \u00B7 Built by @in_herspace"
-      )
+      e("div",{style:{marginTop:32,paddingTop:16,borderTop:"1px solid #1e2d3d",textAlign:"center",color:"#2d3748",fontSize:11}},"ISO 27001:2022 \u00B7 NIST CSF 2.0 \u00B7 SOC 2 2022 \u00B7 CIS v8 \u00B7 PCI DSS 4.0 \u00B7 Cyber Essentials")
     )
   );
 }
