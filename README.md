@@ -99,4 +99,4 @@ MIT — free to use, modify, and share.
 
 Built by a GRC professional who got tired of tab-switching between framework PDFs. 
 
-🐦 Follow progress [@in_herspace](https://twitter.com/in_herspace)
+💼 Follow my LinkedIn: [Princess David-Okoro](https://www.linkedin.com/in/princessdavidokoro/)
