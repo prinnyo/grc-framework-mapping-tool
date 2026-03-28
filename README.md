@@ -36,6 +36,7 @@ Built for GRC professionals who are tired of tab-switching between framework PDF
 
 ### Full Control Descriptions
 Every framework reference shows the complete control statement — not just an ID. Expand any control card to see:
+- **Official ISO 27002:2022 control statements**
 - NIST CSF 2.0 subcategory descriptions
 - SOC 2 Trust Services Criteria text
 - CIS Controls v8 safeguard descriptions
@@ -109,7 +110,7 @@ MIT — free to use, modify, and share.
 
 **The Problem:** GRC professionals waste hours jumping between framework PDFs to find equivalent controls. Understanding what each control actually requires means opening yet another document.
 
-**The Solution:** All 93 ISO 27001:2022 controls mapped to 5 frameworks in one searchable, filterable interface — with full control descriptions and detailed implementation guidance baked in.
+**The Solution:** All 93 ISO 27001:2022 controls mapped to 5 frameworks in one searchable, filterable interface — with the exact ISO 27002 standards, full cross-framework control descriptions, and detailed implementation guidance baked in.
 
 **The Impact:** What used to take hours now takes seconds. One tool for audit prep, gap assessments, implementation planning, and multi-framework compliance.
 
