@@ -17,15 +17,22 @@
   input::placeholder { color: #3a4a5a; }
   input:focus { border-color: #00d4aa !important; box-shadow: 0 0 0 2px #00d4aa20; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
   .card-enter { animation: fadeIn 0.2s ease-out; }
   .control-card { transition: border-color 0.15s, box-shadow 0.15s; }
   .control-card:hover { border-color: #2a3a4a !important; box-shadow: 0 2px 12px #00000030; }
   .expand-content { animation: fadeIn 0.2s ease-out; }
+  .autocomplete-dropdown { animation: slideDown 0.2s ease-out; }
+  .tutorial-modal { animation: fadeIn 0.3s ease-out; }
+  .example-search { transition: all 0.15s; }
+  .example-search:hover { background: #1e2d3d !important; transform: translateY(-1px); }
   button { font-family: inherit; }
   button:hover { filter: brightness(1.15); }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: #080e18; }
   ::-webkit-scrollbar-thumb { background: #1e2d3d; border-radius: 3px; }
+  .pulse { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 </style>
 </head>
 <body>
@@ -34,7 +41,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script>
 const e = React.createElement;
-const { useState, useMemo, useCallback } = React;
+const { useState, useMemo, useCallback, useEffect } = React;
 
 const CONTROLS = [
   {id:"A.5.1",name:"Policies for information security",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-01, GV.PO-02",soc2:"CC1.1, CC5.2",cis:"CIS 1, CIS 2",pci:"Req 12",ce:"N/A",notes:"Foundation control - map policies to each framework requirement"},
@@ -132,10 +139,218 @@ const CONTROLS = [
   {id:"A.8.34",name:"Protection of info systems during audit testing",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC4.1",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Minimise business impact of audits"},
 ];
 
+const EXAMPLE_SEARCHES = [
+  { text: "MFA", desc: "Multi-factor authentication" },
+  { text: "A.5.17", desc: "Specific ISO control" },
+  { text: "CC6.1", desc: "SOC 2 criteria" },
+  { text: "CIS 5", desc: "CIS Control 5" },
+  { text: "encryption", desc: "Cryptography controls" },
+  { text: "access control", desc: "Access management" },
+  { text: "incident", desc: "Incident management" },
+  { text: "backup", desc: "Data protection" }
+];
+
 const FC = {GOVERN:"#F59E0B",IDENTIFY:"#10B981",PROTECT:"#3B82F6",DETECT:"#8B5CF6",RESPOND:"#EF4444",RECOVER:"#06B6D4"};
 const CC = {Organizational:"#3B82F6",People:"#10B981",Physical:"#F59E0B",Technological:"#8B5CF6"};
 
 function Tag({text,color}){return e("span",{style:{display:"inline-block",padding:"2px 8px",borderRadius:4,fontSize:11,fontWeight:600,background:color+"18",color,border:"1px solid "+color+"30",marginRight:4,marginBottom:2,whiteSpace:"nowrap"}},text)}
+
+function TutorialModal({onClose}) {
+  return e("div", {
+    className: "tutorial-modal",
+    style: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: "rgba(8, 14, 24, 0.95)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1000,
+      padding: 20
+    }
+  },
+    e("div", {
+      style: {
+        background: "#0d1520",
+        border: "1px solid #1e2d3d",
+        borderRadius: 12,
+        padding: "24px 28px",
+        maxWidth: 500,
+        width: "100%"
+      }
+    },
+      e("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 20 } },
+        e("span", { style: { fontSize: 24 } }, "🎯"),
+        e("h2", { style: { fontSize: 20, fontWeight: 700, color: "#fff", margin: 0 } }, "Quick Tour")
+      ),
+      e("div", { style: { marginBottom: 20, lineHeight: 1.6 } },
+        e("div", { style: { marginBottom: 16 } },
+          e("div", { style: { fontWeight: 600, color: "#00d4aa", marginBottom: 4 } }, "🔍 Search Anything"),
+          e("div", { style: { color: "#a0aec0", fontSize: 14 } }, "Control IDs (A.5.2), framework refs (CC6.1, CIS 5), or keywords (MFA, encryption)")
+        ),
+        e("div", { style: { marginBottom: 16 } },
+          e("div", { style: { fontWeight: 600, color: "#00d4aa", marginBottom: 4 } }, "🏷️ Smart Filters"),
+          e("div", { style: { color: "#a0aec0", fontSize: 14 } }, "Filter by ISO category or NIST function to narrow results")
+        ),
+        e("div", { style: { marginBottom: 16 } },
+          e("div", { style: { fontWeight: 600, color: "#00d4aa", marginBottom: 4 } }, "📋 Expand Controls"),
+          e("div", { style: { color: "#a0aec0", fontSize: 14 } }, "Click any control card to see full framework mappings and implementation notes")
+        ),
+        e("div", {},
+          e("div", { style: { fontWeight: 600, color: "#00d4aa", marginBottom: 4 } }, "📊 Live Stats"),
+          e("div", { style: { color: "#a0aec0", fontSize: 14 } }, "Control counts update in real-time as you filter")
+        )
+      ),
+      e("div", { style: { textAlign: "right" } },
+        e("button", {
+          onClick: onClose,
+          style: {
+            padding: "8px 18px",
+            borderRadius: 6,
+            border: "1px solid #00d4aa",
+            background: "#00d4aa18",
+            color: "#00d4aa",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: "pointer"
+          }
+        }, "Got it!")
+      )
+    )
+  );
+}
+
+function ExampleSearches({onSearchClick, search}) {
+  if (search.length > 0) return null;
+  
+  return e("div", { style: { marginBottom: 16 } },
+    e("div", { style: { fontSize: 12, color: "#4a5568", fontWeight: 600, marginBottom: 8 } }, "💡 Try these searches:"),
+    e("div", { style: { display: "flex", gap: 6, flexWrap: "wrap" } },
+      EXAMPLE_SEARCHES.map(ex => 
+        e("button", {
+          key: ex.text,
+          className: "example-search",
+          onClick: () => onSearchClick(ex.text),
+          style: {
+            padding: "4px 10px",
+            borderRadius: 16,
+            border: "1px solid #1e2d3d",
+            background: "#0d1520",
+            color: "#a0aec0",
+            fontSize: 12,
+            cursor: "pointer",
+            whiteSpace: "nowrap"
+          }
+        }, ex.text)
+      )
+    )
+  );
+}
+
+function SearchWithAutocomplete({search, setSearch, onSearchClick}) {
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  
+  const generateSuggestions = useCallback((query) => {
+    if (!query || query.length < 2) return [];
+    
+    const q = query.toLowerCase();
+    const matches = [];
+    
+    CONTROLS.forEach(c => {
+      if (c.id.toLowerCase().includes(q)) matches.push({ type: "Control ID", text: c.id, desc: c.name });
+      else if (c.name.toLowerCase().includes(q)) matches.push({ type: "Control", text: c.name.slice(0, 40) + (c.name.length > 40 ? "..." : ""), desc: c.id });
+      else if (c.soc2.toLowerCase().includes(q)) matches.push({ type: "SOC 2", text: c.soc2.split(",")[0].trim(), desc: c.id + " - " + c.name.slice(0, 30) });
+      else if (c.cis.toLowerCase().includes(q)) matches.push({ type: "CIS", text: c.cis.split(",")[0].trim(), desc: c.id + " - " + c.name.slice(0, 30) });
+      else if (c.nistCat.toLowerCase().includes(q)) matches.push({ type: "NIST", text: c.nistCat, desc: c.id + " - " + c.name.slice(0, 30) });
+    });
+    
+    // Add keyword suggestions
+    const keywords = ["MFA", "encryption", "access control", "incident", "backup", "authentication", "malware", "vulnerability", "logging", "monitoring"];
+    keywords.forEach(kw => {
+      if (kw.toLowerCase().includes(q)) matches.push({ type: "Keyword", text: kw, desc: "Search for controls related to " + kw });
+    });
+    
+    return [...new Map(matches.map(m => [m.text, m])).values()].slice(0, 8);
+  }, []);
+  
+  useEffect(() => {
+    const newSuggestions = generateSuggestions(search);
+    setSuggestions(newSuggestions);
+    setShowSuggestions(newSuggestions.length > 0 && search.length >= 2);
+  }, [search, generateSuggestions]);
+  
+  const handleSuggestionClick = (suggestion) => {
+    setSearch(suggestion.text);
+    setShowSuggestions(false);
+  };
+  
+  return e("div", { style: { position: "relative", marginBottom: 14 } },
+    e("input", {
+      type: "text",
+      value: search,
+      onChange: (ev) => setSearch(ev.target.value),
+      onBlur: () => setTimeout(() => setShowSuggestions(false), 150),
+      onFocus: () => setSuggestions(generateSuggestions(search)),
+      placeholder: "Search controls, frameworks, keywords (e.g. MFA, CC6.1, CIS 5, access)...",
+      style: {
+        width: "100%",
+        padding: "12px 16px",
+        borderRadius: 8,
+        border: "1px solid #1e2d3d",
+        background: "#0d1520",
+        color: "#e2e8f0",
+        fontSize: 14,
+        outline: "none",
+        boxSizing: "border-box",
+        fontFamily: "inherit"
+      }
+    }),
+    showSuggestions && e("div", {
+      className: "autocomplete-dropdown",
+      style: {
+        position: "absolute",
+        top: "100%",
+        left: 0,
+        right: 0,
+        background: "#0d1520",
+        border: "1px solid #1e2d3d",
+        borderTop: "none",
+        borderRadius: "0 0 8px 8px",
+        zIndex: 100,
+        maxHeight: 200,
+        overflow: "auto"
+      }
+    },
+      suggestions.map((suggestion, i) =>
+        e("div", {
+          key: i,
+          onClick: () => handleSuggestionClick(suggestion),
+          style: {
+            padding: "8px 12px",
+            cursor: "pointer",
+            borderBottom: i < suggestions.length - 1 ? "1px solid #1a2a3a" : "none",
+            transition: "background 0.15s"
+          },
+          onMouseEnter: (ev) => ev.target.style.background = "#1a2a3a",
+          onMouseLeave: (ev) => ev.target.style.background = "transparent"
+        },
+          e("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } },
+            e("div", {},
+              e("span", { style: { color: "#00d4aa", fontSize: 13, fontWeight: 600 } }, suggestion.text),
+              e("div", { style: { color: "#4a5568", fontSize: 11, marginTop: 2 } }, suggestion.desc)
+            ),
+            e("span", { style: { fontSize: 10, color: "#4a5568", fontWeight: 600, textTransform: "uppercase" } }, suggestion.type)
+          )
+        )
+      )
+    ),
+    e(ExampleSearches, { onSearchClick, search })
+  );
+}
 
 function ControlCard({c,expanded,onToggle}){
   return e("div",{className:"control-card",onClick:onToggle,style:{background:"#0d1520",border:"1px solid #1e2d3d",borderRadius:8,padding:"14px 18px",cursor:"pointer",borderLeft:"3px solid "+FC[c.nistFunc]}},
@@ -176,6 +391,15 @@ function App(){
   var _c=useState("All"),catFilter=_c[0],setCatFilter=_c[1];
   var _f=useState("All"),funcFilter=_f[0],setFuncFilter=_f[1];
   var _e=useState(null),expanded=_e[0],setExpanded=_e[1];
+  var _t=useState(false),showTutorial=_t[0],setShowTutorial=_t[1];
+  
+  // Show tutorial on first visit
+  useEffect(() => {
+    if (!localStorage.getItem('grc-tool-visited')) {
+      setShowTutorial(true);
+      localStorage.setItem('grc-tool-visited', 'true');
+    }
+  }, []);
 
   var filtered=useMemo(function(){
     var q=search.toLowerCase();
@@ -191,16 +415,27 @@ function App(){
     return{total:filtered.length,funcs:Object.keys(FC).map(function(f){return{name:f,count:filtered.filter(function(c){return c.nistFunc===f}).length}})};
   },[filtered]);
 
+  const handleExampleSearch = (searchText) => {
+    setSearch(searchText);
+  };
+
   return e("div",{style:{minHeight:"100vh",background:"#080e18",color:"#e2e8f0",fontFamily:"'DM Sans','Segoe UI',sans-serif"}},
+    showTutorial && e(TutorialModal, { onClose: () => setShowTutorial(false) }),
     e("div",{style:{maxWidth:720,margin:"0 auto",padding:"24px 16px"}},
       e("div",{style:{marginBottom:28}},
-        e("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:4}},
-          e("span",{style:{fontSize:22}},"\uD83D\uDEE1"),
-          e("h1",{style:{fontSize:22,fontWeight:800,color:"#fff",margin:0}},"InfoSec Controls Cross-Reference")
+        e("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}},
+          e("div",{style:{display:"flex",alignItems:"center",gap:10}},
+            e("span",{style:{fontSize:22}},"\uD83D\uDEE1"),
+            e("h1",{style:{fontSize:22,fontWeight:800,color:"#fff",margin:0}},"InfoSec Controls Cross-Reference")
+          ),
+          e("button",{
+            onClick:()=>setShowTutorial(true),
+            style:{padding:"4px 12px",borderRadius:16,border:"1px solid #1e2d3d",background:"transparent",color:"#4a5568",fontSize:11,fontWeight:600,cursor:"pointer"}
+          },"? Help")
         ),
         e("p",{style:{color:"#4a5568",fontSize:13,margin:"4px 0 0"}},"ISO 27001:2022 \u2192 NIST CSF 2.0 \u00B7 SOC 2 \u00B7 CIS v8 \u00B7 PCI DSS \u00B7 Cyber Essentials")
       ),
-      e("input",{type:"text",value:search,onChange:function(ev){setSearch(ev.target.value)},placeholder:"Search controls, frameworks, keywords (e.g. MFA, CC6.1, CIS 5, access)...",style:{width:"100%",padding:"12px 16px",borderRadius:8,border:"1px solid #1e2d3d",background:"#0d1520",color:"#e2e8f0",fontSize:14,outline:"none",boxSizing:"border-box",marginBottom:14,fontFamily:"inherit"}}),
+      e(SearchWithAutocomplete, { search, setSearch, onSearchClick: handleExampleSearch }),
       e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}},
         e("span",{style:{fontSize:11,color:"#4a5568",fontWeight:600,alignSelf:"center",marginRight:4}},"ISO Category:"),
         ["All","Organizational","People","Physical","Technological"].map(function(c){return e(Pill,{key:c,label:c,active:catFilter===c,onClick:function(){setCatFilter(c)},color:CC[c]})})
