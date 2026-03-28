@@ -22,9 +22,7 @@ A free, interactive tool that maps all 93 ISO 27001:2022 Annex A controls to fiv
 
 ## Live Demo
 
-👉 [View the tool](https://yourusername.github.io/grc-framework-tool)
-
-*(Replace with your actual GitHub Pages URL after deployment)*
+👉 [View the tool](https://prinnyo.github.io/grc-framework-mapping-tool)
 
 ## Who Is This For
 
