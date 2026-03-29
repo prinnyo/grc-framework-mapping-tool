@@ -31,6 +31,47 @@
   ::-webkit-scrollbar-track{background:#080e18}
   ::-webkit-scrollbar-thumb{background:#1e2d3d;border-radius:3px}
 </style>
+  <style>
+    :root {
+      --bg-main: #080e18;
+      --bg-card: #0d1520;
+      --bg-nested: #0a1929;
+      --bg-highlight: #0d1d2d;
+      --bg-focus: #1a2a3a;
+      --bg-overlay: rgba(8,14,24,0.95);
+      --border-main: #1e2d3d;
+      --border-main-50: #1e2d3d50;
+      --border-main-40: #1e2d3d40;
+      --text-primary: #e2e8f0;
+      --text-header: #fff;
+      --text-secondary: #a0aec0;
+      --text-muted: #8a9ab0;
+      --text-darker: #4a5568;
+      --text-sub: #6a7a90;
+      --text-footer: #2d3748;
+      --text-italic: #3a4a5a;
+    }
+    [data-theme='light'] {
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-nested: #f1f5f9;
+      --bg-highlight: #e2e8f0;
+      --bg-focus: #cbd5e1;
+      --bg-overlay: rgba(255,255,255,0.95);
+      --border-main: #cbd5e1;
+      --border-main-50: #cbd5e150;
+      --border-main-40: #cbd5e140;
+      --text-primary: #1e293b;
+      --text-header: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #475569;
+      --text-darker: #64748b;
+      --text-sub: #64748b;
+      --text-footer: #94a3b8;
+      --text-italic: #64748b;
+    }
+  </style>
+
 </head>
 <body>
 <div id="root"></div>
@@ -49,7 +90,34 @@ var PCI_DESC={"Req 1":"Install and Maintain Network Security Controls","Req 2":"
 
 var CE_DESC={"Access Control":"Ensure that only authorised users can access your devices, systems, and data using user accounts and strong authentication","Secure Config":"Ensure computers and network devices are properly configured to reduce vulnerabilities and provide only the services required","Firewalls":"Establish network boundary defences, particularly internet gateways, using firewalls or equivalent network devices","Malware Protection":"Protect against malware using anti-malware software and other malware protection measures appropriate to the risk","Security Updates":"Keep devices, software, and applications up to date by applying patches and updates in a timely manner","N/A":""};
 
-var CONTROLS=[
+var CLAUSES=[
+{id:"4.1",isoDesc:"The organization shall determine external and internal issues that are relevant to its purpose and that affect its ability to achieve the intended outcome(s) of its information security management system.",name:"Understanding the organization and its context",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.OC",nistSub:"GV.OC-02",soc2:"CC1.1",cis:"N/A",pci:"N/A",ce:"N/A",notes:"Conduct a formal SWOT or PESTLE analysis annually. Document internal issues (culture, resources, processes) and external issues (legal, regulatory, tech market). Review the context formally during the annual Management Review."},
+{id:"4.2",isoDesc:"The organization shall determine interested parties that are relevant to the ISMS, the requirements of these interested parties, and which of these requirements will be addressed.",name:"Understanding needs and expectations of interested parties",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.OC",nistSub:"GV.OC-02, GV.OC-03",soc2:"CC1.1",cis:"N/A",pci:"N/A",ce:"N/A",notes:"Maintain an 'Interested Parties Register' logging internal stakeholders (staff, board) and external stakeholders (regulators, customers, vendors). Detail their specific security, privacy, and compliance requirements (e.g., SLA uptime needs, GDPR compliance)."},
+{id:"4.3",isoDesc:"The organization shall determine the boundaries and applicability of the ISMS to establish its scope.",name:"Determining the scope of the information security management system",cat:"Management System",nistFunc:"IDENTIFY",nistCat:"ID.AM",nistSub:"ID.AM-01, ID.AM-02",soc2:"CC3.1",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Document the formal ISMS Scope Statement. Explicitly define what physical locations, business units, services, and networks are included and excluded. Ensure the scope directly addresses the context (4.1) and interested party requirements (4.2)."},
+{id:"4.4",isoDesc:"The organization shall establish, implement, maintain and continually improve an information security management system, including the processes needed and their interactions.",name:"Information security management system",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-02",soc2:"CC1.1",cis:"N/A",pci:"N/A",ce:"N/A",notes:"This wraps the entire standard. Ensure processes (risk management, internal audit, incident response) interact harmoniously. Map the core processes in a high-level flowchart or operating model diagram within the ISMS Manual."},
+{id:"5.1",isoDesc:"Top management shall demonstrate leadership and commitment with respect to the ISMS by directing and supporting persons to contribute to the effectiveness of the ISMS and promoting continual improvement.",name:"Leadership and commitment",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-01, GV.PO-01",soc2:"CC1.1, CC1.3",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Ensure senior leadership (C-Suite/Board) actively signs off on the Information Security Policy. Evidence leadership commitment through meeting minutes, budget allocations for security tools, and explicit alignment of security objectives with business strategy."},
+{id:"5.2",isoDesc:"Top management shall establish an information security policy that is appropriate to the purpose of the organization and provides a framework for setting information security objectives.",name:"Policy",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-01, GV.PO-02",soc2:"CC1.1",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Publish a high-level 'Information Security Policy'. It must explicitly state commitment to fulfilling requirements and continual improvement. It does not need to be deeply technical—keep it accessible to all staff and publicly accessible if needed."},
+{id:"5.3",isoDesc:"Top management shall ensure that the responsibilities and authorities for roles relevant to information security are assigned and communicated.",name:"Organizational roles, responsibilities and authorities",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-02",soc2:"CC1.3",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Document a formal RACI chart or Organizational Chart defining who owns the ISMS. Define role descriptions for the CISO/Security Manager, Risk Owners, Asset Owners, and the steering committee. Communicate these designations clearly."},
+{id:"6.1.1",isoDesc:"When planning for the ISMS, the organization shall consider issues, requirements, and determine the risks and opportunities that need to be addressed.",name:"General (Actions to address risks and opportunities)",cat:"Management System",nistFunc:"IDENTIFY",nistCat:"ID.RA",nistSub:"ID.RA-01",soc2:"CC3.1",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Ensure the risk assessment explicitly covers not just negative threats (risks) but positive security opportunities (e.g., migrating to a secure cloud platform to reduce physical security overhead). Tie these directly back to the context defined in 4.1."},
+{id:"6.1.2",isoDesc:"The organization shall define and apply an information security risk assessment process that establishes and maintains information security risk criteria.",name:"Information security risk assessment",cat:"Management System",nistFunc:"IDENTIFY",nistCat:"ID.RA",nistSub:"ID.RA-01",soc2:"CC3.1",cis:"N/A",pci:"Req 12.1",ce:"N/A",notes:"Publish a 'Risk Assessment Methodology' document. Define explicit criteria for calculating Impact and Likelihood (e.g., 5x5 matrix). Define the explicit risk acceptance threshold (e.g., 'Medium risks require mitigation plan, Low risks are accepted')."},
+{id:"6.1.3",isoDesc:"The organization shall define and apply an information security risk treatment process to select appropriate information security risk treatment options.",name:"Information security risk treatment",cat:"Management System",nistFunc:"IDENTIFY",nistCat:"ID.IM",nistSub:"ID.IM-01",soc2:"CC3.1, CC5.1",cis:"N/A",pci:"Req 12.1",ce:"N/A",notes:"For every assessed risk exceeding the threshold, map it to a treatment option (Mitigate, Transfer/Insure, Avoid, Accept). Produce a formal Risk Treatment Plan (RTP). Crucially, map the chosen mitigations directly to the 93 operational controls in Annex A."},
+{id:"6.1.3(d)",isoDesc:"The organization shall produce a Statement of Applicability (SoA) that contains the necessary controls and justification for inclusions or exclusions.",name:"Statement of Applicability (SoA)",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-01",soc2:"CC5.1",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Draft the formal SoA spreadsheet or document. It must list all 93 controls from ISO 27001 Annex A, explicitly state 'Applicable' or 'Not Applicable', provide brief justification for either status, and map to the specific risk treatment it resolves."},
+{id:"6.2",isoDesc:"The organization shall establish information security objectives at relevant functions and levels. The objectives shall be measurable (if practicable).",name:"Information security objectives and planning to achieve them",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.OV",nistSub:"GV.OV-01, GV.OV-02",soc2:"CC3.1",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Define specific, measurable, achievable, relevant, and time-bound (SMART) security objectives for the year (e.g., 'Achieve >95% completion rate of security training', 'Maintain zero critical data breaches'). Document action plans to achieve them."},
+{id:"7.1",isoDesc:"The organization shall determine and provide the resources needed for the establishment, implementation, maintenance and continual improvement of the ISMS.",name:"Resources",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-03",soc2:"CC1.1",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Evidence that management has provided sufficient resources. This includes financial budget for security tools, headcount for security staffing, and dedicated time for personnel to perform risk assessments and audits."},
+{id:"7.2",isoDesc:"The organization shall determine the necessary competence of person(s) doing work under its control that affects its information security performance.",name:"Competence",cat:"Management System",nistFunc:"PROTECT",nistCat:"PR.AT",nistSub:"PR.AT-02",soc2:"CC1.4",cis:"CIS 14",pci:"Req 12.7",ce:"N/A",notes:"Maintain job descriptions detailing required security qualifications for sensitive roles (e.g., CISO requires CISSP or equivalent). Maintain records of training, certifications, and education verifying staff competence."},
+{id:"7.3",isoDesc:"Persons doing work under the organization's control shall be aware of the information security policy and their contribution to the effectiveness of the ISMS.",name:"Awareness",cat:"Management System",nistFunc:"PROTECT",nistCat:"PR.AT",nistSub:"PR.AT-01",soc2:"CC1.5, CC2.2",cis:"CIS 14",pci:"Req 12.6",ce:"N/A",notes:"Implement mandatory annual security awareness training for all staff and contractors. Content must explicitly mention the Information Security Policy, the implications of non-compliance, and how to report incidents. Track completion metrics."},
+{id:"7.4",isoDesc:"The organization shall determine the need for internal and external communications relevant to the information security management system.",name:"Communication",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.OC",nistSub:"GV.OC-02",soc2:"CC2.2, CC2.3",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Draft a 'Communications Plan' that outlines: on what topics to communicate (incidents, policy updates), when to communicate, with whom (regulators, clients, staff), and who is explicitly authorized to communicate (PR, Legal, C-Suite)."},
+{id:"7.5",isoDesc:"The organization's ISMS shall include documented information required by this document and determined as necessary for the effectiveness of the ISMS.",name:"Documented information",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-01",soc2:"CC1.1",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Establish document control rules. Ensure every ISMS policy, procedure, and manual has a version number, author, approver, and date. Ensure confidential ISMS documents are protected from unauthorized viewing or tampering."},
+{id:"8.1",isoDesc:"The organization shall plan, implement and control the processes needed to meet information security requirements, and to implement the actions determined in Clause 6.",name:"Operational planning and control",cat:"Management System",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"CC5.1, CC5.2",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"This links the planning (Clause 6) to the actual doing. Ensure the Risk Treatment Plans are actively executed. Control planned changes, and review the consequences of unintended changes, taking action to mitigate adverse effects."},
+{id:"8.2",isoDesc:"The organization shall perform information security risk assessments at planned intervals or when significant changes are proposed or occur.",name:"Information security risk assessment (Operational)",cat:"Management System",nistFunc:"IDENTIFY",nistCat:"ID.RA",nistSub:"ID.RA-01",soc2:"CC3.1",cis:"N/A",pci:"Req 12.1",ce:"N/A",notes:"Do not let the risk register stagnate. Formally schedule risk assessment reviews at least annually, and immediately following major architectural changes, cloud migrations, or significant security incidents. Retain documented evidence of the results."},
+{id:"8.3",isoDesc:"The organization shall implement the information security risk treatment plan. The organization shall retain documented information of the results.",name:"Information security risk treatment (Operational)",cat:"Management System",nistFunc:"IDENTIFY",nistCat:"ID.IM",nistSub:"ID.IM-01",soc2:"CC3.1",cis:"N/A",pci:"Req 12.1",ce:"N/A",notes:"Evidence the active implementation of the RTP. If a treatment was 'Deploy EDR tools by Q3', provide the project closure sign-offs or active deployed tooling proof. Retain records showing the progression and completion of risk treatments."},
+{id:"9.1",isoDesc:"The organization shall evaluate the information security performance and the effectiveness of the ISMS. It shall determine what needs to be monitored and measured.",name:"Monitoring, measurement, analysis and evaluation",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.OV",nistSub:"GV.OV-03",soc2:"CC4.1",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Define explicit KPIs/metrics for ISMS performance (e.g., 'Phishing click rate < 5%', 'Critical patches deployed < 7 days'). Collect the data routinely and present the analysis to management to prove whether security controls are actually working."},
+{id:"9.2",isoDesc:"The organization shall conduct internal audits at planned intervals to provide information on whether the ISMS conforms to requirements and is effectively implemented.",name:"Internal audit",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.OV",nistSub:"GV.OV-03",soc2:"CC4.1",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Establish a 3-year audit programme covering all clauses and controls. Use independent auditors (internal staff outside the ISMS chain of command, or external consultants). Document the audit findings and formally assign nonconformities."},
+{id:"9.3",isoDesc:"Top management shall review the organization's information security management system at planned intervals to ensure its continuing suitability, adequacy and effectiveness.",name:"Management review",cat:"Management System",nistFunc:"GOVERN",nistCat:"GV.OV",nistSub:"GV.OV-01",soc2:"CC4.1, CC4.2",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Conduct the 'Management Review Meeting' at least annually. Follow the strict agenda defined by ISO (review of previous actions, internal audit results, risk assessments, KPIs, continual improvement opportunities). Retain signed meeting minutes as evidence."},
+{id:"10.1",isoDesc:"The organization shall continually improve the suitability, adequacy and effectiveness of the information security management system.",name:"Continual improvement",cat:"Management System",nistFunc:"IDENTIFY",nistCat:"ID.IM",nistSub:"ID.IM-01",soc2:"CC4.2",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Evidence that the ISMS is maturing over time. Pull examples from management reviews, audit findings, and completed risk treatment plans demonstrating that the organization's security posture is stronger today than it was a year ago."},
+{id:"10.2",isoDesc:"When a nonconformity occurs, the organization shall react to the nonconformity, evaluate the need for action to eliminate causes, and implement corrective actions.",name:"Nonconformity and corrective action",cat:"Management System",nistFunc:"IDENTIFY",nistCat:"ID.IM",nistSub:"ID.IM-01",soc2:"CC4.2",cis:"N/A",pci:"Req 12",ce:"N/A",notes:"Maintain a 'Corrective Action Register' (CAR) or root-cause tracking system. When an internal audit, external audit, or incident reveals a failure, formally log it, perform root cause analysis (e.g., 5 Whys), assign corrective tasks, and verify they resolved the root cause."}
+];
+var CONTROLS=CLAUSES.concat([
 {id:"A.5.1",isoDesc:"Information security policy and topic-specific policies should be defined, approved by management, published, communicated to and acknowledged by relevant personnel and relevant interested parties, and reviewed at planned intervals and if significant changes occur.",name:"Policies for information security",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.PO",nistSub:"GV.PO-01, GV.PO-02",soc2:"CC1.1, CC5.2",cis:"CIS 1, CIS 2",pci:"Req 12",ce:"N/A",notes:"Establish a top-level information security policy approved by senior management, supported by topic-specific policies (e.g. access control, data classification, incident response). Review at least annually or after significant changes. Ensure policies are communicated to all staff, contractors, and relevant third parties. Map each policy to specific framework requirements across ISO 27001, NIST CSF, SOC 2, and PCI DSS to demonstrate cross-framework alignment during audits."},
 {id:"A.5.2",isoDesc:"Information security roles and responsibilities should be defined and allocated according to the organization needs.",name:"Information security roles and responsibilities",cat:"Organizational",nistFunc:"GOVERN",nistCat:"GV.RR",nistSub:"GV.RR-01, GV.RR-02",soc2:"CC1.3, CC1.4",cis:"CIS 1",pci:"Req 12",ce:"N/A",notes:"Define a RACI matrix covering all information security functions including risk management, incident response, compliance monitoring, and security architecture. Assign an Information Security Manager or CISO with clear authority. Ensure segregation between those who authorise, implement, and review security controls. Document reporting lines to senior management and the board. Review role assignments during organisational restructures."},
 {id:"A.5.3",isoDesc:"Conflicting duties and conflicting areas of responsibility should be segregated.",name:"Segregation of duties",cat:"Organizational",nistFunc:"PROTECT",nistCat:"PR.AA",nistSub:"PR.AA-05",soc2:"CC5.1, CC6.1",cis:"CIS 5, CIS 6",pci:"Req 7",ce:"Access Control",notes:"Implement segregation of duties to prevent any single individual from controlling all aspects of a critical process. Map critical business processes and identify conflict-of-interest pairs (e.g. change approval vs. deployment, user provisioning vs. access review). Where segregation is not feasible due to team size, implement compensating controls such as enhanced logging, management review, and dual authorisation for high-risk actions."},
@@ -143,7 +211,7 @@ var CONTROLS=[
 {id:"A.8.32",isoDesc:"Changes to information processing facilities and information systems should be subject to change management procedures.",name:"Change management",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.PS",nistSub:"PR.PS-01",soc2:"CC8.1",cis:"CIS 4",pci:"Req 6.5",ce:"N/A",notes:"Implement a formal change management process: RFC submission with business justification and security impact assessment, risk categorisation (standard, normal, emergency), CAB review for normal and significant changes, testing and rollback plan documentation, deployment window scheduling, post-implementation verification, and documentation update. Track all changes in a change management system. Audit emergency changes retrospectively. Monitor for unauthorised changes through configuration monitoring."},
 {id:"A.8.33",isoDesc:"Test information should be appropriately selected, protected and managed.",name:"Test information",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC6.1",cis:"CIS 3, CIS 16",pci:"Req 6",ce:"N/A",notes:"Prohibit the use of production data in test environments. Generate realistic test data using data masking, synthetic data generation, or pseudonymisation tools. Ensure test data maintains referential integrity and edge cases for valid testing. Apply the same classification and protection controls to test data as to the source data if masking is not applied. Securely destroy test data after use. Document test data handling procedures. Audit compliance with test data policies."},
 {id:"A.8.34",isoDesc:"Audit tests and other assurance activities involving assessment of operational systems should be planned and agreed between the tester and appropriate management.",name:"Protection of info systems during audit testing",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC4.1",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Plan audit testing activities to minimise disruption to production systems and business operations. Schedule intensive testing (e.g. penetration tests, performance tests) during maintenance windows or low-activity periods. Restrict auditor access to the minimum required — use read-only access where possible. Monitor auditor activities during testing. Ensure audit tools are approved and do not introduce vulnerabilities. Obtain sign-off from system owners before audit testing. Back up systems before destructive testing."}
-];
+]);
 
 var FRAMEWORKS=[
   {id:"ISO 27001",prop:"id",color:"#00d4aa",desc:null},
@@ -165,34 +233,35 @@ function ReverseCard(p){
       return { id: f.id, color: f.color, refs: Object.keys(u).sort().join(", "), lookup: f.desc };
   });
 
-  return e("div",{className:"control-card",onClick:p.onToggle,style:{background:"#0d1520",border:"1px solid #1e2d3d",borderRadius:8,padding:"14px 18px",cursor:"pointer",borderLeft:"3px solid "+fw.color,marginBottom:8}},
+  return e("div",{className:"control-card",onClick:p.onToggle,style:{background:"var(--bg-card)",border:"1px solid #1e2d3d",borderRadius:8,padding:"14px 18px",cursor:"pointer",borderLeft:"3px solid "+fw.color,marginBottom:8}},
     e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12}},
       e("div",{style:{flex:1,minWidth:0}},
         e("div",{style:{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:6}},
           e("span",{style:{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:fw.color,fontSize:14}},i.id)
         ),
-        e("div",{style:{color:"#e2e8f0",fontSize:13,fontWeight:500,lineHeight:1.4}},i.desc||"")
+        e("div",{style:{color:"var(--text-primary)",fontSize:13,fontWeight:500,lineHeight:1.4}},i.desc||"")
       ),
       e("div",{style:{display:"flex",alignItems:"center",gap:12}},
-        e("span",{style:{fontSize:11,color:"#4a5568",fontWeight:600,padding:"2px 8px",background:"#1e2d3d50",borderRadius:12}},i.controls.length+" ISO core"),
-        e("span",{style:{color:"#4a5568",fontSize:18,flexShrink:0}},p.expanded?"\u2212":"+")
+        e("span",{style:{fontSize:11,color:"var(--text-darker)",fontWeight:600,padding:"2px 8px",background:"#var(--border-main-50)",borderRadius:12}},i.controls.length+" ISO core"),
+        e("span",{style:{color:"var(--text-darker)",fontSize:18,flexShrink:0}},p.expanded?"\u2212":"+")
       )
     ),
     p.expanded&&e("div",{className:"expand-content",onClick:function(ev){ev.stopPropagation()},style:{marginTop:14,paddingTop:14,borderTop:"1px solid #1e2d3d",display:"flex",flexDirection:"column",gap:12}},
       e("div",{style:{marginBottom:12}},
-         e("div",{style:{fontSize:11,fontWeight:700,color:"#8a9ab0",textTransform:"uppercase",letterSpacing:1,marginBottom:12,borderBottom:"1px solid #1e2d3d",paddingBottom:8}},"Transitive Framework Cross-Mappings"),
+         e("div",{style:{fontSize:11,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:1,marginBottom:12,borderBottom:"1px solid #1e2d3d",paddingBottom:8}},"Transitive Framework Cross-Mappings"),
          transitive.filter(function(t){return t.refs.length>0}).map(function(t){ return e(FwSection, {key:t.id, title:t.id, refs:t.refs, lookup:t.lookup, color:t.color}) })
       ),
       e("div",{},
          e("div",{style:{fontSize:11,fontWeight:700,color:"#00d4aa",textTransform:"uppercase",letterSpacing:1,marginBottom:12,borderBottom:"1px solid #1e2d3d",paddingBottom:8}},"Via ISO 27001:2022 Controls"),
          i.controls.map(function(c){
-           return e("div",{key:c.id,style:{padding:"12px 14px",background:"#0a1929",borderRadius:6,borderLeft:"2px solid #00d4aa",marginBottom:8}},
+           return e("div",{key:c.id,style:{padding:"12px 14px",background:"var(--bg-nested)",borderRadius:6,borderLeft:"2px solid #00d4aa",marginBottom:8}},
              e("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:6}},
                 e("span",{style:{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:"#00d4aa",fontSize:13}},c.id),
-                e("span",{style:{fontSize:11,color:"#e2e8f0",fontWeight:600}},c.name)
+                e("span",{style:{fontSize:11,color:"var(--text-primary)",fontWeight:600}},c.name)
              ),
-             e("div",{style:{fontSize:12,color:"#a0aec0",lineHeight:1.4,marginBottom:8,fontStyle:"italic"}},c.isoDesc),
-             e("div",{style:{fontSize:12,color:"#8a9ab0",lineHeight:1.4}},c.notes)
+             e("div",{style:{fontSize:12,color:"var(--text-secondary)",lineHeight:1.4,marginBottom:8,fontStyle:"italic"}},c.isoDesc),
+             e("div",{style:{fontSize:12,color:"var(--text-muted)",lineHeight:1.4}},c.notes),
+             e(ScoreSelector,{controlId:c.id,score:p.scores[c.id],onChange:p.onScoreChange})
            )
          })
       )
@@ -200,10 +269,28 @@ function ReverseCard(p){
   );
 }
 
+function ScoreSelector(p){
+  var s=p.score||"unimplemented",opts=[{id:"unimplemented",label:"Not Implemented",icon:"🔴",color:"var(--text-darker)"},{id:"progress",label:"In Progress",icon:"🟡",color:"#F59E0B"},{id:"implemented",label:"Implemented",icon:"🟢",color:"#10B981"}];
+  return e("div",{style:{display:"flex",gap:4,background:"var(--bg-highlight)",padding:4,borderRadius:20,border:"1px solid #1e2d3d",marginTop:12,width:"fit-content"}},
+    opts.map(function(o){var act=s===o.id;return e("button",{key:o.id,onClick:function(ev){ev.stopPropagation();p.onChange(p.controlId,o.id)},title:o.label,style:{padding:"4px 12px",borderRadius:16,border:"none",background:act?o.color+"20":"transparent",color:act?o.color:"var(--text-sub)",fontSize:11,fontWeight:act?700:500,cursor:"pointer",display:"flex",alignItems:"center",gap:6,transition:"all 0.2s"}},o.icon,act?o.label:"")})
+  );
+}
+
+function ProgressBar(p){
+  var t=p.controls.length;if(t===0)return null;var s=p.scores||{},score=p.controls.reduce(function(acc,c){if(s[c.id]==="implemented")return acc+1;if(s[c.id]==="progress")return acc+0.5;return acc;},0),pct=Math.round((score/t)*100);
+  return e("div",{style:{marginBottom:24,background:"var(--bg-card)",border:"1px solid #1e2d3d",borderRadius:8,padding:"16px 20px"}},
+    e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}},
+      e("div",{style:{fontSize:13,fontWeight:700,color:"var(--text-secondary)",textTransform:"uppercase",letterSpacing:1}},"Audit Readiness (Current Scope)"),
+      e("div",{style:{fontSize:24,fontWeight:800,color:pct===100?"#10B981":pct>50?"#F59E0B":"#EF4444"}},pct+"%")
+    ),
+    e("div",{style:{height:8,background:"var(--bg-focus)",borderRadius:4,overflow:"hidden"}},e("div",{style:{height:"100%",width:pct+"%",background:pct===100?"#10B981":pct>50?"#F59E0B":"#EF4444",transition:"width 0.4s ease-out"}}))
+  );
+}
+
 var EXAMPLE_SEARCHES=[{text:"MFA",desc:"Multi-factor authentication"},{text:"A.5.17",desc:"Specific ISO control"},{text:"CC6.1",desc:"SOC 2 criteria"},{text:"CIS 5",desc:"CIS Control 5"},{text:"encryption",desc:"Cryptography controls"},{text:"access control",desc:"Access management"},{text:"incident",desc:"Incident management"},{text:"backup",desc:"Data protection"}];
 
 var FC={GOVERN:"#F59E0B",IDENTIFY:"#10B981",PROTECT:"#3B82F6",DETECT:"#8B5CF6",RESPOND:"#EF4444",RECOVER:"#06B6D4"};
-var CC_COL={Organizational:"#3B82F6",People:"#10B981",Physical:"#F59E0B",Technological:"#8B5CF6"};
+var CC_COL={Organizational:"#3B82F6",People:"#10B981",Physical:"#F59E0B",Technological:"#8B5CF6","Management System":"#00d4aa"};
 
 function splitRefs(s){return s.split(",").map(function(r){return r.trim()}).filter(function(r){return r&&r!=="N/A"})}
 
@@ -211,22 +298,22 @@ function Tag(p){return e("span",{style:{display:"inline-block",padding:"2px 8px"
 
 function FwSection(p){
   var items=splitRefs(p.refs);
-  if(items.length===0)return e("div",{style:{marginBottom:12}},e("div",{style:{fontSize:10,fontWeight:700,color:"#4a5568",textTransform:"uppercase",letterSpacing:1,marginBottom:4}},p.title),e("div",{style:{fontSize:12,color:"#3a4a5a",fontStyle:"italic"}},"Not applicable"));
+  if(items.length===0)return e("div",{style:{marginBottom:12}},e("div",{style:{fontSize:10,fontWeight:700,color:"var(--text-darker)",textTransform:"uppercase",letterSpacing:1,marginBottom:4}},p.title),e("div",{style:{fontSize:12,color:"var(--text-italic)",fontStyle:"italic"}},"Not applicable"));
   return e("div",{style:{marginBottom:14}},
-    e("div",{style:{fontSize:10,fontWeight:700,color:p.color||"#4a5568",textTransform:"uppercase",letterSpacing:1,marginBottom:6}},p.title),
-    items.map(function(ref){var desc=p.lookup[ref]||"";return e("div",{key:ref,style:{marginBottom:6,paddingLeft:10,borderLeft:"2px solid "+(p.color||"#1e2d3d")+"40"}},e("div",{style:{fontFamily:"'JetBrains Mono',monospace",fontSize:12,color:"#00d4aa",fontWeight:600}},ref),desc&&e("div",{style:{fontSize:12,color:"#8a9ab0",lineHeight:1.4,marginTop:1}},desc))})
+    e("div",{style:{fontSize:10,fontWeight:700,color:p.color||"var(--text-darker)",textTransform:"uppercase",letterSpacing:1,marginBottom:6}},p.title),
+    items.map(function(ref){var desc=p.lookup[ref]||"";return e("div",{key:ref,style:{marginBottom:6,paddingLeft:10,borderLeft:"2px solid "+(p.color||"var(--border-main)")+"40"}},e("div",{style:{fontFamily:"'JetBrains Mono',monospace",fontSize:12,color:"#00d4aa",fontWeight:600}},ref),desc&&e("div",{style:{fontSize:12,color:"var(--text-muted)",lineHeight:1.4,marginTop:1}},desc))})
   );
 }
 
 function TutorialModal(p){
-  return e("div",{className:"tutorial-modal",style:{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(8,14,24,0.95)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:1000,padding:20}},
-    e("div",{style:{background:"#0d1520",border:"1px solid #1e2d3d",borderRadius:12,padding:"24px 28px",maxWidth:500,width:"100%"}},
-      e("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:20}},e("span",{style:{fontSize:24}},"\uD83C\uDFAF"),e("h2",{style:{fontSize:20,fontWeight:700,color:"#fff",margin:0}},"Quick Tour")),
+  return e("div",{className:"tutorial-modal",style:{position:"fixed",top:0,left:0,right:0,bottom:0,background:"var(--bg-overlay)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:1000,padding:20}},
+    e("div",{style:{background:"var(--bg-card)",border:"1px solid #1e2d3d",borderRadius:12,padding:"24px 28px",maxWidth:500,width:"100%"}},
+      e("div",{style:{display:"flex",alignItems:"center",gap:12,marginBottom:20}},e("span",{style:{fontSize:24}},"\uD83C\uDFAF"),e("h2",{style:{fontSize:20,fontWeight:700,color:"var(--text-header)",margin:0}},"Quick Tour")),
       e("div",{style:{marginBottom:20,lineHeight:1.6}},
-        e("div",{style:{marginBottom:16}},e("div",{style:{fontWeight:600,color:"#00d4aa",marginBottom:4}},"\uD83D\uDD0D Search Anything"),e("div",{style:{color:"#a0aec0",fontSize:14}},"Control IDs (A.5.2), framework refs (CC6.1, CIS 5), or keywords (MFA, encryption)")),
-        e("div",{style:{marginBottom:16}},e("div",{style:{fontWeight:600,color:"#00d4aa",marginBottom:4}},"\uD83C\uDFF7\uFE0F Smart Filters"),e("div",{style:{color:"#a0aec0",fontSize:14}},"Filter by ISO category or NIST function to narrow results")),
-        e("div",{style:{marginBottom:16}},e("div",{style:{fontWeight:600,color:"#00d4aa",marginBottom:4}},"\uD83D\uDCCB Full Control Descriptions"),e("div",{style:{color:"#a0aec0",fontSize:14}},"Expand any control to see full requirement text for every mapped framework")),
-        e("div",{},e("div",{style:{fontWeight:600,color:"#00d4aa",marginBottom:4}},"\uD83D\uDCCA Live Stats"),e("div",{style:{color:"#a0aec0",fontSize:14}},"Control counts update in real-time as you filter"))
+        e("div",{style:{marginBottom:16}},e("div",{style:{fontWeight:600,color:"#00d4aa",marginBottom:4}},"\uD83D\uDD0D Search Anything"),e("div",{style:{color:"var(--text-secondary)",fontSize:14}},"Control IDs (A.5.2), framework refs (CC6.1, CIS 5), or keywords (MFA, encryption)")),
+        e("div",{style:{marginBottom:16}},e("div",{style:{fontWeight:600,color:"#00d4aa",marginBottom:4}},"\uD83C\uDFF7\uFE0F Smart Filters"),e("div",{style:{color:"var(--text-secondary)",fontSize:14}},"Filter by ISO category or NIST function to narrow results")),
+        e("div",{style:{marginBottom:16}},e("div",{style:{fontWeight:600,color:"#00d4aa",marginBottom:4}},"\uD83D\uDCCB Full Control Descriptions"),e("div",{style:{color:"var(--text-secondary)",fontSize:14}},"Expand any control to see full requirement text for every mapped framework")),
+        e("div",{},e("div",{style:{fontWeight:600,color:"#00d4aa",marginBottom:4}},"\uD83D\uDCCA Live Stats"),e("div",{style:{color:"var(--text-secondary)",fontSize:14}},"Control counts update in real-time as you filter"))
       ),
       e("div",{style:{textAlign:"right"}},e("button",{onClick:p.onClose,style:{padding:"8px 18px",borderRadius:6,border:"1px solid #00d4aa",background:"#00d4aa18",color:"#00d4aa",fontSize:14,fontWeight:600,cursor:"pointer"}},"Got it!"))
     )
@@ -236,8 +323,8 @@ function TutorialModal(p){
 function ExampleSearches(p){
   if(p.search.length>0)return null;
   return e("div",{style:{marginBottom:16}},
-    e("div",{style:{fontSize:12,color:"#4a5568",fontWeight:600,marginBottom:8}},"\uD83D\uDCA1 Try these searches:"),
-    e("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},EXAMPLE_SEARCHES.map(function(ex){return e("button",{key:ex.text,className:"example-search",onClick:function(){p.onSearchClick(ex.text)},style:{padding:"4px 10px",borderRadius:16,border:"1px solid #1e2d3d",background:"#0d1520",color:"#a0aec0",fontSize:12,cursor:"pointer",whiteSpace:"nowrap"}},ex.text)}))
+    e("div",{style:{fontSize:12,color:"var(--text-darker)",fontWeight:600,marginBottom:8}},"\uD83D\uDCA1 Try these searches:"),
+    e("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},EXAMPLE_SEARCHES.map(function(ex){return e("button",{key:ex.text,className:"example-search",onClick:function(){p.onSearchClick(ex.text)},style:{padding:"4px 10px",borderRadius:16,border:"1px solid #1e2d3d",background:"var(--bg-card)",color:"var(--text-secondary)",fontSize:12,cursor:"pointer",whiteSpace:"nowrap"}},ex.text)}))
   );
 }
 
@@ -258,15 +345,15 @@ function SearchBox(p){
   },[]);
   useEffect(function(){var ns=gen(p.search);setSug(ns);setShow(ns.length>0&&p.search.length>=2)},[p.search,gen]);
   return e("div",{style:{position:"relative",marginBottom:14}},
-    e("input",{type:"text",value:p.search,onChange:function(ev){p.setSearch(ev.target.value)},onBlur:function(){setTimeout(function(){setShow(false)},150)},onFocus:function(){setSug(gen(p.search))},placeholder:"Search controls, frameworks, keywords (e.g. MFA, CC6.1, CIS 5, access)...",style:{width:"100%",padding:"12px 16px",borderRadius:8,border:"1px solid #1e2d3d",background:"#0d1520",color:"#e2e8f0",fontSize:14,outline:"none",boxSizing:"border-box",fontFamily:"inherit"}}),
-    show&&e("div",{className:"autocomplete-dropdown",style:{position:"absolute",top:"100%",left:0,right:0,background:"#0d1520",border:"1px solid #1e2d3d",borderTop:"none",borderRadius:"0 0 8px 8px",zIndex:100,maxHeight:200,overflow:"auto"}},sug.map(function(s,i){return e("div",{key:i,onClick:function(){p.setSearch(s.text);setShow(false)},style:{padding:"8px 12px",cursor:"pointer",borderBottom:i<sug.length-1?"1px solid #1a2a3a":"none"},onMouseEnter:function(ev){ev.currentTarget.style.background="#1a2a3a"},onMouseLeave:function(ev){ev.currentTarget.style.background="transparent"}},e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},e("div",{},e("span",{style:{color:"#00d4aa",fontSize:13,fontWeight:600}},s.text),e("div",{style:{color:"#4a5568",fontSize:11,marginTop:2}},s.desc)),e("span",{style:{fontSize:10,color:"#4a5568",fontWeight:600,textTransform:"uppercase"}},s.type)))})),
+    e("input",{type:"text",value:p.search,onChange:function(ev){p.setSearch(ev.target.value)},onBlur:function(){setTimeout(function(){setShow(false)},150)},onFocus:function(){setSug(gen(p.search))},placeholder:"Search controls, frameworks, keywords (e.g. MFA, CC6.1, CIS 5, access)...",style:{width:"100%",padding:"12px 16px",borderRadius:8,border:"1px solid #1e2d3d",background:"var(--bg-card)",color:"var(--text-primary)",fontSize:14,outline:"none",boxSizing:"border-box",fontFamily:"inherit"}}),
+    show&&e("div",{className:"autocomplete-dropdown",style:{position:"absolute",top:"100%",left:0,right:0,background:"var(--bg-card)",border:"1px solid #1e2d3d",borderTop:"none",borderRadius:"0 0 8px 8px",zIndex:100,maxHeight:200,overflow:"auto"}},sug.map(function(s,i){return e("div",{key:i,onClick:function(){p.setSearch(s.text);setShow(false)},style:{padding:"8px 12px",cursor:"pointer",borderBottom:i<sug.length-1?"1px solid #1a2a3a":"none"},onMouseEnter:function(ev){ev.currentTarget.style.background="var(--bg-focus)"},onMouseLeave:function(ev){ev.currentTarget.style.background="transparent"}},e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},e("div",{},e("span",{style:{color:"#00d4aa",fontSize:13,fontWeight:600}},s.text),e("div",{style:{color:"var(--text-darker)",fontSize:11,marginTop:2}},s.desc)),e("span",{style:{fontSize:10,color:"var(--text-darker)",fontWeight:600,textTransform:"uppercase"}},s.type)))})),
     e(ExampleSearches,{onSearchClick:p.onSearchClick,search:p.search})
   );
 }
 
 function ControlCard(p){
   var c=p.c;
-  return e("div",{className:"control-card",onClick:p.onToggle,style:{background:"#0d1520",border:"1px solid #1e2d3d",borderRadius:8,padding:"14px 18px",cursor:"pointer",borderLeft:"3px solid "+FC[c.nistFunc]}},
+  return e("div",{className:"control-card",onClick:p.onToggle,style:{background:"var(--bg-card)",border:"1px solid #1e2d3d",borderRadius:8,padding:"14px 18px",cursor:"pointer",borderLeft:"3px solid "+FC[c.nistFunc]}},
     e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12}},
       e("div",{style:{flex:1,minWidth:0}},
         e("div",{style:{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:6}},
@@ -274,9 +361,9 @@ function ControlCard(p){
           e(Tag,{text:c.cat,color:CC_COL[c.cat]}),
           e(Tag,{text:c.nistFunc,color:FC[c.nistFunc]})
         ),
-        e("div",{style:{color:"#e2e8f0",fontSize:14,fontWeight:500,lineHeight:1.4}},c.name)
+        e("div",{style:{color:"var(--text-primary)",fontSize:14,fontWeight:500,lineHeight:1.4}},c.name)
       ),
-      e("span",{style:{color:"#4a5568",fontSize:18,flexShrink:0,marginTop:2}},p.expanded?"\u2212":"+")
+      e("span",{style:{color:"var(--text-darker)",fontSize:18,flexShrink:0,marginTop:2}},p.expanded?"\u2212":"+")
     ),
     p.expanded&&e("div",{className:"expand-content",onClick:function(ev){ev.stopPropagation()},style:{marginTop:14,paddingTop:14,borderTop:"1px solid #1e2d3d"}},
       e(FwSection,{title:"NIST CSF 2.0",refs:c.nistSub,lookup:NIST_DESC,color:FC[c.nistFunc]}),
@@ -284,19 +371,20 @@ function ControlCard(p){
       e(FwSection,{title:"CIS Controls v8",refs:c.cis,lookup:CIS_DESC,color:"#10B981"}),
       e(FwSection,{title:"PCI DSS 4.0",refs:c.pci,lookup:PCI_DESC,color:"#F59E0B"}),
       e(FwSection,{title:"Cyber Essentials",refs:c.ce,lookup:CE_DESC,color:"#06B6D4"}),
-      e("div",{style:{marginTop:14,marginBottom:12,padding:"10px 14px",background:"#0d1d2d",borderRadius:6,borderLeft:"3px solid #00d4aa"}},
+      e("div",{style:{marginTop:14,marginBottom:12,padding:"10px 14px",background:"var(--bg-highlight)",borderRadius:6,borderLeft:"3px solid #00d4aa"}},
         e("div",{style:{fontSize:11,fontWeight:700,color:"#00d4aa",textTransform:"uppercase",letterSpacing:1,marginBottom:4}},"ISO/IEC 27002:2022 Control"),
-        e("div",{style:{fontSize:13,color:"#e2e8f0",lineHeight:1.5,fontStyle:"italic"}},c.isoDesc)
+        e("div",{style:{fontSize:13,color:"var(--text-primary)",lineHeight:1.5,fontStyle:"italic"}},c.isoDesc)
       ),
-      e("div",{style:{marginTop:12,padding:"8px 12px",background:"#0a1929",borderRadius:6,border:"1px solid #1a2a3a"}},
+      e("div",{style:{marginTop:12,padding:"8px 12px",background:"var(--bg-nested)",borderRadius:6,border:"1px solid #1a2a3a"}},
         e("div",{style:{fontSize:10,fontWeight:700,color:"#00d4aa",textTransform:"uppercase",letterSpacing:1,marginBottom:2}},"Implementation Guidance"),
-        e("div",{style:{fontSize:13,color:"#a0aec0",lineHeight:1.5}},c.notes)
-      )
+        e("div",{style:{fontSize:13,color:"var(--text-secondary)",lineHeight:1.5}},c.notes)
+      ),
+      e(ScoreSelector,{controlId:c.id,score:p.scores[c.id],onChange:p.onScoreChange})
     )
   );
 }
 
-function Pill(p){return e("button",{onClick:p.onClick,style:{padding:"5px 14px",borderRadius:20,border:p.active?"1px solid "+(p.color||"#00d4aa"):"1px solid #1e2d3d",background:p.active?(p.color||"#00d4aa")+"18":"transparent",color:p.active?(p.color||"#00d4aa"):"#4a5568",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap"}},p.label)}
+function Pill(p){return e("button",{onClick:p.onClick,style:{padding:"5px 14px",borderRadius:20,border:p.active?"1px solid "+(p.color||"#00d4aa"):"1px solid #1e2d3d",background:p.active?(p.color||"#00d4aa")+"18":"transparent",color:p.active?(p.color||"#00d4aa"):"var(--text-darker)",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap"}},p.label)}
 
 function App(){
   var _pf=useState("ISO 27001"),primaryFw=_pf[0],setPrimaryFw=_pf[1];
@@ -309,6 +397,11 @@ function App(){
   var _ce=useState("All"),ceF=_ce[0],setCeF=_ce[1];
   var _e2=useState(null),exp=_e2[0],setExp=_e2[1];
   var _t=useState(false),showT=_t[0],setShowT=_t[1];
+  var _th=useState(function(){try{return localStorage.getItem("grc-theme")||(window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark")}catch(e){return"dark"}}),theme=_th[0],setTheme=_th[1];
+  useEffect(function(){document.documentElement.setAttribute("data-theme",theme);try{localStorage.setItem("grc-theme",theme)}catch(e){}},[theme]);
+
+  var _sc=useState(function(){try{var v=localStorage.getItem("grc-scores");return v?JSON.parse(v):{}}catch(e){return{}}}),scores=_sc[0],setScores=_sc[1];
+  var handleScore=useCallback(function(id,val){setScores(function(p){var n=Object.assign({},p);n[id]=val;try{localStorage.setItem("grc-scores",JSON.stringify(n))}catch(e){}return n})},[]);
 
   useEffect(function(){try{if(!localStorage.getItem("grc-v2")){setShowT(true);localStorage.setItem("grc-v2","1")}}catch(e){setShowT(true)}},[]);
 
@@ -352,30 +445,34 @@ function App(){
     }
   },[filteredIsos,derivedList,primaryFw]);
 
-  return e("div",{style:{minHeight:"100vh",background:"#080e18",color:"#e2e8f0",fontFamily:"'DM Sans','Segoe UI',sans-serif"}},
+  return e("div",{style:{minHeight:"100vh",background:"var(--bg-main)",color:"var(--text-primary)",fontFamily:"'DM Sans','Segoe UI',sans-serif"}},
     showT&&e(TutorialModal,{onClose:function(){setShowT(false)}}),
     e("div",{style:{maxWidth:"100%",margin:"0 auto",padding:"24px 48px"}},
       e("div",{style:{marginBottom:28}},
         e("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}},
-          e("div",{style:{display:"flex",alignItems:"center",gap:10}},e("span",{style:{fontSize:22}},"\uD83D\uDEE1"),e("h1",{style:{fontSize:22,fontWeight:800,color:"#fff",margin:0}},"InfoSec Controls Cross-Reference")),
-          e("button",{onClick:function(){setShowT(true)},style:{padding:"4px 12px",borderRadius:16,border:"1px solid #1e2d3d",background:"transparent",color:"#4a5568",fontSize:11,fontWeight:600,cursor:"pointer"}},"? Help")
+          e("div",{style:{display:"flex",alignItems:"center",gap:10}},e("span",{style:{fontSize:22}},"\uD83D\uDEE1"),e("h1",{style:{fontSize:22,fontWeight:800,color:"var(--text-header)",margin:0}},"InfoSec Controls Cross-Reference")),
+          e("div",{style:{display:"flex",gap:8,alignItems:"center"}},
+            e("button",{onClick:function(){setTheme(theme==='dark'?'light':'dark')},style:{padding:"4px 12px",borderRadius:16,border:"1px solid var(--border-main)",background:"transparent",color:"var(--text-darker)",fontSize:16,cursor:"pointer"}},theme==='light'?"🌙":"☀️"),
+            e("button",{onClick:function(){setShowT(true)},style:{padding:"4px 12px",borderRadius:16,border:"1px solid var(--border-main)",background:"transparent",color:"var(--text-darker)",fontSize:11,fontWeight:600,cursor:"pointer"}},"? Help")
+          )
         ),
-        e("p",{style:{color:"#4a5568",fontSize:13,margin:"4px 0 0"}},"ISO 27001:2022 \u2192 NIST CSF 2.0 \u00B7 SOC 2 \u00B7 CIS v8 \u00B7 PCI DSS \u00B7 Cyber Essentials")
+        e("p",{style:{color:"var(--text-darker)",fontSize:13,margin:"4px 0 0"}},"ISO 27001:2022 \u2192 NIST CSF 2.0 \u00B7 SOC 2 \u00B7 CIS v8 \u00B7 PCI DSS \u00B7 Cyber Essentials")
       ),
-      e("div",{style:{display:"flex",gap:8,marginBottom:24,flexWrap:"wrap",background:"#0d1520",padding:6,borderRadius:8,border:"1px solid #1e2d3d"}},
+      e(ProgressBar,{controls:filteredIsos,scores:scores}),
+      e("div",{style:{display:"flex",gap:8,marginBottom:24,flexWrap:"wrap",background:"var(--bg-card)",padding:6,borderRadius:8,border:"1px solid #1e2d3d"}},
         FRAMEWORKS.map(function(fw){
           var act=primaryFw===fw.id;
-          return e("button",{key:fw.id,onClick:function(){setPrimaryFw(fw.id);setExp(null)},style:{flex:1,padding:"10px",borderRadius:6,border:"none",background:act?"#1a2a3a":"transparent",color:act?"#fff":"#8a9ab0",fontSize:13,fontWeight:act?700:600,cursor:"pointer",transition:"all 0.2s"}},fw.id);
+          return e("button",{key:fw.id,onClick:function(){setPrimaryFw(fw.id);setExp(null)},style:{flex:1,padding:"10px",borderRadius:6,border:"none",background:act?"var(--bg-focus)":"transparent",color:act?"var(--text-header)":"var(--text-muted)",fontSize:13,fontWeight:act?700:600,cursor:"pointer",transition:"all 0.2s"}},fw.id);
         })
       ),
       e(SearchBox,{search:search,setSearch:setSearch,onSearchClick:function(t){setSearch(t)}}),
       (catF!=="All"||funcF!=="All"||socF!=="All"||cisF!=="All"||pciF!=="All"||ceF!=="All")&&e("div",{style:{marginBottom:10}},e("button",{onClick:function(){setCatF("All");setFuncF("All");setSocF("All");setCisF("All");setPciF("All");setCeF("All")},style:{padding:"4px 14px",borderRadius:16,border:"1px solid #EF444460",background:"#EF444412",color:"#EF4444",fontSize:11,fontWeight:600,cursor:"pointer"}},"✕ Clear all filters")),
       e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}},
-        e("span",{style:{fontSize:11,color:"#4a5568",fontWeight:600,alignSelf:"center",marginRight:4}},"ISO Category:"),
-        ["All","Organizational","People","Physical","Technological"].map(function(c){return e(Pill,{key:c,label:c,active:catF===c,onClick:function(){setCatF(c)},color:CC_COL[c]})})
+        e("span",{style:{fontSize:11,color:"var(--text-darker)",fontWeight:600,alignSelf:"center",marginRight:4}},"ISO Category:"),
+        ["All","Management System","Organizational","People","Physical","Technological"].map(function(c){return e(Pill,{key:c,label:c,active:catF===c,onClick:function(){setCatF(c)},color:CC_COL[c]})})
       ),
       e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}},
-        e("span",{style:{fontSize:11,color:"#4a5568",fontWeight:600,alignSelf:"center",marginRight:4}},"NIST Function:"),
+        e("span",{style:{fontSize:11,color:"var(--text-darker)",fontWeight:600,alignSelf:"center",marginRight:4}},"NIST Function:"),
         ["All","GOVERN","IDENTIFY","PROTECT","DETECT","RESPOND","RECOVER"].map(function(f){return e(Pill,{key:f,label:f,active:funcF===f,onClick:function(){setFuncF(f)},color:FC[f]})})
       ),
       e("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}},
@@ -399,16 +496,16 @@ function App(){
         e("div",{style:{padding:"6px 12px",borderRadius:6,background:"#00d4aa12",border:"1px solid #00d4aa25",textAlign:"center"}},e("div",{style:{fontSize:18,fontWeight:800,color:"#00d4aa"}},stats.total),e("div",{style:{fontSize:9,fontWeight:700,color:"#00d4aa",opacity:0.7,textTransform:"uppercase",letterSpacing:.5}},"Total"))
       ),
       e("div",{style:{display:"flex",flexDirection:"column",gap:8}},
-        derivedList.length===0&&e("div",{style:{textAlign:"center",padding:40,color:"#4a5568"}},"No "+primaryFw+" controls match your search or filters."),
+        derivedList.length===0&&e("div",{style:{textAlign:"center",padding:40,color:"var(--text-darker)"}},"No "+primaryFw+" controls match your search or filters."),
         derivedList.map(function(item){
           if(primaryFw==="ISO 27001"){
-            return e(ControlCard,{key:item.id,c:item,expanded:exp===item.id,onToggle:function(){setExp(exp===item.id?null:item.id)}});
+            return e(ControlCard,{key:item.id,c:item,expanded:exp===item.id,onToggle:function(){setExp(exp===item.id?null:item.id)},scores:scores,onScoreChange:handleScore});
           } else {
-            return e(ReverseCard,{key:item.id,item:item,fw:FRAMEWORKS.find(function(f){return f.id===primaryFw}),expanded:exp===item.id,onToggle:function(){setExp(exp===item.id?null:item.id)}});
+            return e(ReverseCard,{key:item.id,item:item,fw:FRAMEWORKS.find(function(f){return f.id===primaryFw}),expanded:exp===item.id,onToggle:function(){setExp(exp===item.id?null:item.id)},scores:scores,onScoreChange:handleScore});
           }
         })
       ),
-      e("div",{style:{marginTop:32,paddingTop:16,borderTop:"1px solid #1e2d3d",textAlign:"center",color:"#2d3748",fontSize:11}},"ISO 27001:2022 \u00B7 NIST CSF 2.0 \u00B7 SOC 2 2022 \u00B7 CIS v8 \u00B7 PCI DSS 4.0 \u00B7 Cyber Essentials")
+      e("div",{style:{marginTop:32,paddingTop:16,borderTop:"1px solid #1e2d3d",textAlign:"center",color:"var(--text-footer)",fontSize:11}},"ISO 27001:2022 \u00B7 NIST CSF 2.0 \u00B7 SOC 2 2022 \u00B7 CIS v8 \u00B7 PCI DSS 4.0 \u00B7 Cyber Essentials")
     )
   );
 }
