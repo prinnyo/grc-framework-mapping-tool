@@ -1,6 +1,6 @@
 # InfoSec Controls Cross-Reference Tool
 
-A free, interactive tool that maps all 93 ISO 27001:2022 Annex A controls to five major cybersecurity frameworks — with full control descriptions and detailed implementation guidance for every mapping.
+A free, interactive tool that maps all 93 ISO 27001:2022 Annex A controls to five major cybersecurity frameworks. Features a dynamic reverse-mapping engine to establish transitive relationships between NIST CSF, SOC 2, CIS v8, PCI DSS, and Cyber Essentials.
 
 Built for GRC professionals who are tired of tab-switching between framework PDFs.
 
@@ -23,6 +23,12 @@ Built for GRC professionals who are tired of tab-switching between framework PDF
 - Smart autocomplete with suggestions as you type
 - Search by control ID (A.5.17), framework reference (CC6.1, CIS 5), or keyword (MFA, encryption, access)
 - Example search shortcuts for quick exploration
+
+### 🔄 Transitive Reverse Mapping (New!)
+Pivot the entire application to view mappings from the perspective of **any** supported framework.
+- Select NIST CSF 2.0, SOC 2, CIS v8, PCI DSS, or Cyber Essentials from the top navigation bar to make it the primary lens.
+- Expanding a framework card (e.g., NIST `GV.PO-01`) instantly calculates and displays **transitive cross-mappings** to all other frameworks (like SOC 2 and CIS v8) that share underlying ISO 27001 controls.
+- Search and label filters intelligently adapt to your selected primary framework.
 
 ### Filtering Across All 6 Frameworks
 - **ISO Category** — Organizational, People, Physical, Technological

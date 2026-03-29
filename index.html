@@ -145,6 +145,61 @@ var CONTROLS=[
 {id:"A.8.34",isoDesc:"Audit tests and other assurance activities involving assessment of operational systems should be planned and agreed between the tester and appropriate management.",name:"Protection of info systems during audit testing",cat:"Technological",nistFunc:"PROTECT",nistCat:"PR.DS",nistSub:"PR.DS-01",soc2:"CC4.1",cis:"CIS 18",pci:"Req 12",ce:"N/A",notes:"Plan audit testing activities to minimise disruption to production systems and business operations. Schedule intensive testing (e.g. penetration tests, performance tests) during maintenance windows or low-activity periods. Restrict auditor access to the minimum required — use read-only access where possible. Monitor auditor activities during testing. Ensure audit tools are approved and do not introduce vulnerabilities. Obtain sign-off from system owners before audit testing. Back up systems before destructive testing."}
 ];
 
+var FRAMEWORKS=[
+  {id:"ISO 27001",prop:"id",color:"#00d4aa",desc:null},
+  {id:"NIST CSF 2.0",prop:"nistSub",color:"#F59E0B",desc:NIST_DESC},
+  {id:"SOC 2",prop:"soc2",color:"#EF4444",desc:SOC2_DESC},
+  {id:"CIS v8",prop:"cis",color:"#10B981",desc:CIS_DESC},
+  {id:"PCI DSS",prop:"pci",color:"#F59E0B",desc:PCI_DESC},
+  {id:"Cyber Essentials",prop:"ce",color:"#06B6D4",desc:CE_DESC}
+];
+
+function ReverseCard(p){
+  var i=p.item,fw=p.fw;
+  
+  var transitive = FRAMEWORKS.filter(function(f){ return f.id !== fw.id && f.id !== "ISO 27001"; }).map(function(f){
+      var u = {};
+      i.controls.forEach(function(c) {
+          splitRefs(c[f.prop]).forEach(function(r) { u[r]=1; });
+      });
+      return { id: f.id, color: f.color, refs: Object.keys(u).sort().join(", "), lookup: f.desc };
+  });
+
+  return e("div",{className:"control-card",onClick:p.onToggle,style:{background:"#0d1520",border:"1px solid #1e2d3d",borderRadius:8,padding:"14px 18px",cursor:"pointer",borderLeft:"3px solid "+fw.color,marginBottom:8}},
+    e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12}},
+      e("div",{style:{flex:1,minWidth:0}},
+        e("div",{style:{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:6}},
+          e("span",{style:{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:fw.color,fontSize:14}},i.id)
+        ),
+        e("div",{style:{color:"#e2e8f0",fontSize:13,fontWeight:500,lineHeight:1.4}},i.desc||"")
+      ),
+      e("div",{style:{display:"flex",alignItems:"center",gap:12}},
+        e("span",{style:{fontSize:11,color:"#4a5568",fontWeight:600,padding:"2px 8px",background:"#1e2d3d50",borderRadius:12}},i.controls.length+" ISO core"),
+        e("span",{style:{color:"#4a5568",fontSize:18,flexShrink:0}},p.expanded?"\u2212":"+")
+      )
+    ),
+    p.expanded&&e("div",{className:"expand-content",onClick:function(ev){ev.stopPropagation()},style:{marginTop:14,paddingTop:14,borderTop:"1px solid #1e2d3d",display:"flex",flexDirection:"column",gap:12}},
+      e("div",{style:{marginBottom:12}},
+         e("div",{style:{fontSize:11,fontWeight:700,color:"#8a9ab0",textTransform:"uppercase",letterSpacing:1,marginBottom:12,borderBottom:"1px solid #1e2d3d",paddingBottom:8}},"Transitive Framework Cross-Mappings"),
+         transitive.filter(function(t){return t.refs.length>0}).map(function(t){ return e(FwSection, {key:t.id, title:t.id, refs:t.refs, lookup:t.lookup, color:t.color}) })
+      ),
+      e("div",{},
+         e("div",{style:{fontSize:11,fontWeight:700,color:"#00d4aa",textTransform:"uppercase",letterSpacing:1,marginBottom:12,borderBottom:"1px solid #1e2d3d",paddingBottom:8}},"Via ISO 27001:2022 Controls"),
+         i.controls.map(function(c){
+           return e("div",{key:c.id,style:{padding:"12px 14px",background:"#0a1929",borderRadius:6,borderLeft:"2px solid #00d4aa",marginBottom:8}},
+             e("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:6}},
+                e("span",{style:{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,color:"#00d4aa",fontSize:13}},c.id),
+                e("span",{style:{fontSize:11,color:"#e2e8f0",fontWeight:600}},c.name)
+             ),
+             e("div",{style:{fontSize:12,color:"#a0aec0",lineHeight:1.4,marginBottom:8,fontStyle:"italic"}},c.isoDesc),
+             e("div",{style:{fontSize:12,color:"#8a9ab0",lineHeight:1.4}},c.notes)
+           )
+         })
+      )
+    )
+  );
+}
+
 var EXAMPLE_SEARCHES=[{text:"MFA",desc:"Multi-factor authentication"},{text:"A.5.17",desc:"Specific ISO control"},{text:"CC6.1",desc:"SOC 2 criteria"},{text:"CIS 5",desc:"CIS Control 5"},{text:"encryption",desc:"Cryptography controls"},{text:"access control",desc:"Access management"},{text:"incident",desc:"Incident management"},{text:"backup",desc:"Data protection"}];
 
 var FC={GOVERN:"#F59E0B",IDENTIFY:"#10B981",PROTECT:"#3B82F6",DETECT:"#8B5CF6",RESPOND:"#EF4444",RECOVER:"#06B6D4"};
@@ -244,6 +299,7 @@ function ControlCard(p){
 function Pill(p){return e("button",{onClick:p.onClick,style:{padding:"5px 14px",borderRadius:20,border:p.active?"1px solid "+(p.color||"#00d4aa"):"1px solid #1e2d3d",background:p.active?(p.color||"#00d4aa")+"18":"transparent",color:p.active?(p.color||"#00d4aa"):"#4a5568",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap"}},p.label)}
 
 function App(){
+  var _pf=useState("ISO 27001"),primaryFw=_pf[0],setPrimaryFw=_pf[1];
   var _s=useState(""),search=_s[0],setSearch=_s[1];
   var _c=useState("All"),catF=_c[0],setCatF=_c[1];
   var _f=useState("All"),funcF=_f[0],setFuncF=_f[1];
@@ -256,7 +312,7 @@ function App(){
 
   useEffect(function(){try{if(!localStorage.getItem("grc-v2")){setShowT(true);localStorage.setItem("grc-v2","1")}}catch(e){setShowT(true)}},[]);
 
-  var filtered=useMemo(function(){
+  var filteredIsos=useMemo(function(){
     var q=search.toLowerCase();
     return CONTROLS.filter(function(c){
       if(catF!=="All"&&c.cat!==catF)return false;
@@ -270,7 +326,31 @@ function App(){
     });
   },[search,catF,funcF,socF,cisF,pciF,ceF]);
 
-  var stats=useMemo(function(){return{total:filtered.length,funcs:Object.keys(FC).map(function(f){return{name:f,count:filtered.filter(function(c){return c.nistFunc===f}).length}})}},[filtered]);
+  var derivedList=useMemo(function(){
+    if(primaryFw==="ISO 27001")return filteredIsos;
+    var fw=FRAMEWORKS.find(function(f){return f.id===primaryFw});
+    var grouped={};
+    if(fw.desc){
+      Object.keys(fw.desc).forEach(function(k){grouped[k]={id:k,desc:fw.desc[k],controls:[]}});
+    }
+    filteredIsos.forEach(function(c){
+      var r=pciF; // hacky variable reusing avoided
+      var refs=splitRefs(c[fw.prop]);
+      refs.forEach(function(ref){
+        if(!grouped[ref])grouped[ref]={id:ref,desc:"",controls:[]};
+        grouped[ref].controls.push(c);
+      });
+    });
+    return Object.values(grouped).filter(function(g){return g.controls.length>0}).sort(function(a,b){return a.id.localeCompare(b.id,undefined,{numeric:true})});
+  },[filteredIsos,primaryFw]);
+
+  var stats=useMemo(function(){
+    if(primaryFw==="ISO 27001"){
+      return{total:filteredIsos.length,funcs:Object.keys(FC).map(function(f){return{name:f,count:filteredIsos.filter(function(c){return c.nistFunc===f}).length}})};
+    } else {
+      return{total:derivedList.length,funcs:[]};
+    }
+  },[filteredIsos,derivedList,primaryFw]);
 
   return e("div",{style:{minHeight:"100vh",background:"#080e18",color:"#e2e8f0",fontFamily:"'DM Sans','Segoe UI',sans-serif"}},
     showT&&e(TutorialModal,{onClose:function(){setShowT(false)}}),
@@ -281,6 +361,12 @@ function App(){
           e("button",{onClick:function(){setShowT(true)},style:{padding:"4px 12px",borderRadius:16,border:"1px solid #1e2d3d",background:"transparent",color:"#4a5568",fontSize:11,fontWeight:600,cursor:"pointer"}},"? Help")
         ),
         e("p",{style:{color:"#4a5568",fontSize:13,margin:"4px 0 0"}},"ISO 27001:2022 \u2192 NIST CSF 2.0 \u00B7 SOC 2 \u00B7 CIS v8 \u00B7 PCI DSS \u00B7 Cyber Essentials")
+      ),
+      e("div",{style:{display:"flex",gap:8,marginBottom:24,flexWrap:"wrap",background:"#0d1520",padding:6,borderRadius:8,border:"1px solid #1e2d3d"}},
+        FRAMEWORKS.map(function(fw){
+          var act=primaryFw===fw.id;
+          return e("button",{key:fw.id,onClick:function(){setPrimaryFw(fw.id);setExp(null)},style:{flex:1,padding:"10px",borderRadius:6,border:"none",background:act?"#1a2a3a":"transparent",color:act?"#fff":"#8a9ab0",fontSize:13,fontWeight:act?700:600,cursor:"pointer",transition:"all 0.2s"}},fw.id);
+        })
       ),
       e(SearchBox,{search:search,setSearch:setSearch,onSearchClick:function(t){setSearch(t)}}),
       (catF!=="All"||funcF!=="All"||socF!=="All"||cisF!=="All"||pciF!=="All"||ceF!=="All")&&e("div",{style:{marginBottom:10}},e("button",{onClick:function(){setCatF("All");setFuncF("All");setSocF("All");setCisF("All");setPciF("All");setCeF("All")},style:{padding:"4px 14px",borderRadius:16,border:"1px solid #EF444460",background:"#EF444412",color:"#EF4444",fontSize:11,fontWeight:600,cursor:"pointer"}},"✕ Clear all filters")),
@@ -313,8 +399,14 @@ function App(){
         e("div",{style:{padding:"6px 12px",borderRadius:6,background:"#00d4aa12",border:"1px solid #00d4aa25",textAlign:"center"}},e("div",{style:{fontSize:18,fontWeight:800,color:"#00d4aa"}},stats.total),e("div",{style:{fontSize:9,fontWeight:700,color:"#00d4aa",opacity:0.7,textTransform:"uppercase",letterSpacing:.5}},"Total"))
       ),
       e("div",{style:{display:"flex",flexDirection:"column",gap:8}},
-        filtered.length===0&&e("div",{style:{textAlign:"center",padding:40,color:"#4a5568"}},"No controls match your search."),
-        filtered.map(function(c){return e(ControlCard,{key:c.id,c:c,expanded:exp===c.id,onToggle:function(){setExp(exp===c.id?null:c.id)}})})
+        derivedList.length===0&&e("div",{style:{textAlign:"center",padding:40,color:"#4a5568"}},"No "+primaryFw+" controls match your search or filters."),
+        derivedList.map(function(item){
+          if(primaryFw==="ISO 27001"){
+            return e(ControlCard,{key:item.id,c:item,expanded:exp===item.id,onToggle:function(){setExp(exp===item.id?null:item.id)}});
+          } else {
+            return e(ReverseCard,{key:item.id,item:item,fw:FRAMEWORKS.find(function(f){return f.id===primaryFw}),expanded:exp===item.id,onToggle:function(){setExp(exp===item.id?null:item.id)}});
+          }
+        })
       ),
       e("div",{style:{marginTop:32,paddingTop:16,borderTop:"1px solid #1e2d3d",textAlign:"center",color:"#2d3748",fontSize:11}},"ISO 27001:2022 \u00B7 NIST CSF 2.0 \u00B7 SOC 2 2022 \u00B7 CIS v8 \u00B7 PCI DSS 4.0 \u00B7 Cyber Essentials")
     )
