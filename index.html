@@ -207,6 +207,13 @@ var CC_COL={Organizational:"#3B82F6",People:"#10B981",Physical:"#F59E0B",Technol
 
 function splitRefs(s){return s.split(",").map(function(r){return r.trim()}).filter(function(r){return r&&r!=="N/A"})}
 
+function escapeCSV(v){var s=String(v==null?"":v);return(s.includes(",")||s.includes('"')||s.includes("\n"))?('"'+s.replace(/"/g,'""')+'"'):s}
+function toCSV(controls){
+  var header=["Control ID","Name","Category","NIST Function","NIST Category","NIST Subcategories","SOC 2","CIS v8","PCI DSS","Cyber Essentials","ISO 27002 Description","Implementation Notes"];
+  var rows=controls.map(function(c){return[c.id,c.name,c.cat,c.nistFunc,c.nistCat,c.nistSub,c.soc2,c.cis,c.pci,c.ce,c.isoDesc,c.notes].map(escapeCSV).join(",")});
+  return"\uFEFF"+[header.join(",")].concat(rows).join("\r\n");
+}
+
 function Tag(p){return e("span",{style:{display:"inline-block",padding:"2px 8px",borderRadius:4,fontSize:11,fontWeight:600,background:p.color+"18",color:p.color,border:"1px solid "+p.color+"30",marginRight:4,marginBottom:2,whiteSpace:"nowrap"}},p.text)}
 
 function FwSection(p){
@@ -309,6 +316,29 @@ function App(){
   var _ce=useState("All"),ceF=_ce[0],setCeF=_ce[1];
   var _e2=useState(null),exp=_e2[0],setExp=_e2[1];
   var _t=useState(false),showT=_t[0],setShowT=_t[1];
+  var _toast=useState(false),showToast=_toast[0],setToast=_toast[1];
+
+  function handleExportCSV(){
+    var csv=toCSV(filteredIsos);
+    var blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url;a.download="grc-controls-export.csv";
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url)},100);
+  }
+
+  function handleCopyCSV(){
+    var csv=toCSV(filteredIsos);
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(csv).then(function(){setToast(true);setTimeout(function(){setToast(false)},2000)});
+    } else {
+      var ta=document.createElement("textarea");
+      ta.value=csv;document.body.appendChild(ta);ta.select();
+      document.execCommand("copy");document.body.removeChild(ta);
+      setToast(true);setTimeout(function(){setToast(false)},2000);
+    }
+  }
 
   useEffect(function(){try{if(!localStorage.getItem("grc-v2")){setShowT(true);localStorage.setItem("grc-v2","1")}}catch(e){setShowT(true)}},[]);
 
@@ -397,6 +427,15 @@ function App(){
       e("div",{style:{display:"flex",gap:8,marginBottom:18,flexWrap:"wrap"}},
         stats.funcs.filter(function(f){return f.count>0}).map(function(f){return e("div",{key:f.name,style:{padding:"6px 12px",borderRadius:6,background:FC[f.name]+"12",border:"1px solid "+FC[f.name]+"25",textAlign:"center"}},e("div",{style:{fontSize:18,fontWeight:800,color:FC[f.name]}},f.count),e("div",{style:{fontSize:9,fontWeight:700,color:FC[f.name],opacity:0.7,textTransform:"uppercase",letterSpacing:.5}},f.name))}),
         e("div",{style:{padding:"6px 12px",borderRadius:6,background:"#00d4aa12",border:"1px solid #00d4aa25",textAlign:"center"}},e("div",{style:{fontSize:18,fontWeight:800,color:"#00d4aa"}},stats.total),e("div",{style:{fontSize:9,fontWeight:700,color:"#00d4aa",opacity:0.7,textTransform:"uppercase",letterSpacing:.5}},"Total"))
+      ),
+      e("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:12}},
+        e("button",{onClick:handleExportCSV,style:{padding:"6px 14px",borderRadius:6,border:"1px solid #00d4aa50",background:"#00d4aa12",color:"#00d4aa",fontSize:12,fontWeight:600,cursor:"pointer"}},
+          "\u2B07 Export "+filteredIsos.length+" controls (CSV)"
+        ),
+        e("button",{onClick:handleCopyCSV,style:{padding:"6px 14px",borderRadius:6,border:"1px solid #3B82F650",background:"#3B82F612",color:"#3B82F6",fontSize:12,fontWeight:600,cursor:"pointer"}},
+          "\uD83D\uDCCB Copy to clipboard"
+        ),
+        showToast&&e("span",{style:{fontSize:12,color:"#00d4aa",fontWeight:600,animation:"fadeIn .2s ease-out"}},"Copied!")
       ),
       e("div",{style:{display:"flex",flexDirection:"column",gap:8}},
         derivedList.length===0&&e("div",{style:{textAlign:"center",padding:40,color:"#4a5568"}},"No "+primaryFw+" controls match your search or filters."),
