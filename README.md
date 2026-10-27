@@ -161,6 +161,18 @@ Canonical entrypoint: **`index.html`** (GitHub Pages serves this from the repo r
 
 ---
 
+## Tests / CI
+
+Smoke checks for the static monolith (HTML structure, CDN pins, redirect stub, embedded catalog counts). No frontend build.
+
+```bash
+npm test
+```
+
+GitHub Actions runs the same suite on every pull request and push to `main`.
+
+---
+
 ## Built With
 
 - React 18 (CDN, no build step)

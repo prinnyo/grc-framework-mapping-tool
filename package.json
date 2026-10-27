@@ -1,0 +1,11 @@
+{
+  "name": "grc-framework-mapping-tool",
+  "private": true,
+  "description": "CtrlMap — static HTML GRC cross-reference tool (smoke tests only; no build step)",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
