@@ -502,6 +502,14 @@
   .home-fw-list { font-size:11.5px; color:var(--ink-4); line-height:1.6; }
   .home-nav-btn { display:inline-flex; align-items:center; gap:6px; border:1.5px solid var(--border); background:var(--surface); border-radius:8px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; color:var(--ink-2); font-family:inherit; transition:all 0.15s; }
   .home-nav-btn:hover { border-color:var(--brand); color:var(--brand); background:var(--brand-50); }
+  .map-disclaimer {
+    display:flex; gap:10px; align-items:flex-start;
+    margin:0 0 16px; padding:10px 14px;
+    background:var(--warning-50); border:1px solid var(--warning-100);
+    border-left:3px solid var(--warning); border-radius:8px;
+    color:var(--warning-text); font-size:12.5px; line-height:1.5;
+  }
+  .map-disclaimer strong { font-weight:700; color:var(--warning-text); }
 </style>
 
 </head>
@@ -509,7 +517,6 @@
 <div id="root"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script>
 var e=React.createElement,useState=React.useState,useMemo=React.useMemo,useCallback=React.useCallback,useEffect=React.useEffect;
@@ -7491,7 +7498,7 @@ function TutorialModal(p){
     },
     {n:"06",t:"Transitive cross-mappings between frameworks",
       d:"When viewing a non-ISO framework (e.g. NIST CSF 2.0), each card groups the ISO 27001 controls that reference that subcategory, then derives which SOC 2, CIS, PCI DSS, NIS 2, and other controls are transitively equivalent — no separate lookup table required.",
-      tip:"Pick any SOC 2 criterion and instantly see its CIS v8, PCI DSS, NIS 2, and NCSC CAF equivalents — even though those frameworks have no direct published mapping to each other."
+      tip:"Pick any SOC 2 criterion and instantly see its CIS v8, PCI DSS, NIS 2, and NCSC CAF equivalents — even though those frameworks have no direct published mapping to each other. Treat reverse maps as triage aids: verify against official publications before audit reliance."
     },
     {n:"07",t:"Score implementation readiness + Statement of Applicability",
       d:"Inside any expanded card, use the score selector (Not started / In progress / Implemented) to record your status. For ISO 27001 Annex A controls, a fourth option — Not Applicable — marks a control as excluded from your ISMS scope. When you select Not Applicable, a Justification text field appears for you to record the exclusion reason. The 'SoA' export button in the toolbar generates a formal Statement of Applicability CSV for all 93 Annex A controls.",
@@ -7505,9 +7512,9 @@ function TutorialModal(p){
       d:"CSV and XLSX exports include hierarchical parent columns matched to each framework: Objective + Principle for NCSC CAF; Function + Category for NIST CSF 2.0; Trust Services Category + Criteria Group for SOC 2; Control Group + Impl. Group (IG1/2/3) for CIS v8; Goal for PCI DSS; Theme for Cyber Essentials. The export never includes a column mapping the framework back to itself. All cross-framework mappings, Control Type, Security Domain, Implementation Guidance, Evidence, Assessor Notes, SoA Justification, and Readiness are included. The Excel file colour-codes rows by readiness and includes a 📊 Charts Guide sheet. A separate 'SoA' button exports a dedicated Statement of Applicability CSV covering all 93 Annex A controls — regardless of any active filters.",
       tip:"The Charts Guide sheet provides ready-made COUNTIF formulas and step-by-step instructions for building a readiness pie chart and a bar chart grouped by the framework's top-level category (e.g. by Objective for NCSC CAF, by Function for NIST CSF). The SoA CSV includes Applicable (Yes/No), Justification, ISO 27002:2022 statement, Control Type, and Security Domain — the columns auditors expect for a formal SoA."
     },
-    {n:"10",t:"Reset or clear your data",
-      d:"At the bottom of the left sidebar, 'Reset / Clear data' opens a modal where you can selectively wipe implementation scores, evidence records, or reset the Quick Tour. You can clear scores without losing evidence, or vice versa.",
-      tip:"This is useful when you're starting a new assessment cycle and want a clean slate, or if you need to hand the tool to a colleague. All data lives in your browser's localStorage — closing the tab does not clear it."
+    {n:"10",t:"Backup, restore, or clear your data",
+      d:"At the bottom of the left sidebar, Export assessment JSON downloads your scores, evidence, and SoA justifications; Import restores them from a backup file. 'Reset / Clear data' opens a modal where you can selectively wipe implementation scores, evidence records, or reset the Quick Tour.",
+      tip:"Export a JSON backup before switching browsers or starting a new cycle. All data lives in your browser's localStorage — closing the tab does not clear it, but clearing site data will."
     }
   ];
   return e("div",{className:"modal-backdrop",onClick:p.onClose},
@@ -8088,6 +8095,53 @@ function App(){
       return n;
     });
   },[]);
+  function handleExportAssessment(){
+    var payload={
+      version:1,
+      exportedAt:new Date().toISOString(),
+      app:"CtrlMap",
+      scores:scores,
+      evidence:evidence,
+      justifications:isoJustifications
+    };
+    var blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url;
+    a.download="ctrlmap-assessment-backup.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  function handleImportAssessment(file){
+    if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(){
+      try{
+        var data=JSON.parse(reader.result);
+        if(!data||typeof data!=="object")throw new Error("Invalid backup file");
+        var nextScores=data.scores&&typeof data.scores==="object"?data.scores:{};
+        var nextEvidence=data.evidence&&typeof data.evidence==="object"?data.evidence:{};
+        var nextJust=data.justifications&&typeof data.justifications==="object"?data.justifications:{};
+        var sk=Object.keys(nextScores);
+        if(sk.length>0&&typeof nextScores[sk[0]]==="string"){nextScores={"ISO 27001":nextScores};}
+        try{
+          localStorage.setItem("grc-scores",JSON.stringify(nextScores));
+          localStorage.setItem("grc-evidence",JSON.stringify(nextEvidence));
+          localStorage.setItem("grc-justifications",JSON.stringify(nextJust));
+        }catch(e){}
+        setScores(nextScores);
+        setEvidence(nextEvidence);
+        setIsoJustifications(nextJust);
+        alert("Assessment restored from backup.");
+      }catch(err){
+        alert("Could not import assessment: "+(err&&err.message?err.message:"invalid JSON"));
+      }
+    };
+    reader.onerror=function(){alert("Could not read the selected file.");};
+    reader.readAsText(file);
+  }
   /* Bound callbacks for the active framework — what ReverseCard receives. */
   var fwEvidence = evidence[primaryFw]||{};
   var onEvidenceCheck = useCallback(function(itemId,typeName,checked){toggleEvidenceCheck(primaryFw,itemId,typeName,checked)},[toggleEvidenceCheck,primaryFw]);
@@ -8428,7 +8482,34 @@ function App(){
         e(SidebarSection,{k:"score",label:"Status",children:[{id:"All",label:"All",color:"#0E7C6A"},{id:"unimplemented",label:"Not started",color:"#D92D20"},{id:"progress",label:"In progress",color:"#DC6803"},{id:"implemented",label:"Implemented",color:"#079455"},{id:"not_applicable",label:"Not Applicable",color:"#94A3B8"}].map(function(o){return e(Pill,{key:o.id,label:o.label,active:scoreF===o.id,onClick:function(){setScoreF(o.id)},color:o.color})})}),
         primaryFw==="ISO 27001"&&e(SidebarSection,{k:"ct",label:"Control Type (ISO 27002)",children:["All","Preventive","Detective","Corrective"].map(function(v){var col=v==="Preventive"?"#079455":v==="Detective"?"#175CD3":v==="Corrective"?"#DC6803":"#0E7C6A";return e(Pill,{key:v,label:v,active:ctF===v,onClick:function(){setCtF(v)},color:col})})}),
         primaryFw==="ISO 27001"&&e(SidebarSection,{k:"sd",label:"Security Domain (ISO 27002)",children:["All","Governance and Ecosystem","Protection","Defence","Resilience"].map(function(v){var col=v==="Governance and Ecosystem"?"#6938EF":v==="Protection"?"#079455":v==="Defence"?"#DC6803":v==="Resilience"?"#0BA5EC":"#0E7C6A";return e(Pill,{key:v,label:v==="Governance and Ecosystem"?"Governance":v,active:sdF===v,onClick:function(){setSdF(v)},color:col})})}),
-        e("div",{style:{borderTop:"1px solid var(--border)",margin:"12px 0 0",padding:"10px 4px 2px"}},
+        e("div",{style:{borderTop:"1px solid var(--border)",margin:"12px 0 0",padding:"10px 4px 2px",display:"flex",flexDirection:"column",gap:8}},
+          e("button",{
+            onClick:handleExportAssessment,
+            className:"btn btn-ghost",
+            title:"Download scores, evidence, and SoA justifications as JSON",
+            style:{width:"100%",fontSize:12,color:"var(--ink-3)",display:"flex",alignItems:"center",justifyContent:"center",gap:6,padding:"7px 10px",borderRadius:7,border:"1px solid var(--border)"}
+          },
+            e("span",{style:{fontSize:14,lineHeight:1}},"⬇"),
+            "Export assessment JSON"
+          ),
+          e("label",{
+            className:"btn btn-ghost",
+            title:"Restore scores, evidence, and SoA justifications from a JSON backup",
+            style:{width:"100%",fontSize:12,color:"var(--ink-3)",display:"flex",alignItems:"center",justifyContent:"center",gap:6,padding:"7px 10px",borderRadius:7,border:"1px solid var(--border)",cursor:"pointer",boxSizing:"border-box",margin:0}
+          },
+            e("span",{style:{fontSize:14,lineHeight:1}},"⬆"),
+            "Import assessment JSON",
+            e("input",{
+              type:"file",
+              accept:"application/json,.json",
+              style:{display:"none"},
+              onChange:function(ev){
+                var f=ev.target.files&&ev.target.files[0];
+                handleImportAssessment(f);
+                ev.target.value="";
+              }
+            })
+          ),
           e("button",{
             onClick:function(){setShowReset(true)},
             className:"btn btn-ghost",
@@ -8483,6 +8564,14 @@ function App(){
                     e("span",{style:{fontSize:14,lineHeight:1}},"⎘"),
                     "Copy"
                   )
+                )
+              ),
+              /* Transitive mapping disclaimer — reverse views only */
+              primaryFw!=="ISO 27001"&&e("div",{className:"map-disclaimer",role:"note"},
+                e("span",{style:{fontSize:14,lineHeight:1,flexShrink:0}},"⚠"),
+                e("div",{},
+                  e("strong",null,"Derived mappings — verify before audit reliance. "),
+                  "Cross-framework links on this view are computed transitively through shared ISO 27001:2022 anchors. They are useful for triage, not certified equivalence. Confirm against official framework mappings before audit or certification use."
                 )
               ),
               /* Progress */
