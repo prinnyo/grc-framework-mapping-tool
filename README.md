@@ -41,6 +41,8 @@ An overview page shows all 11 frameworks as donut charts, each reflecting your c
 ### Transitive Reverse Mapping
 Switch the primary lens to **any** framework using the navigation tabs at the top. Select NIST CSF 2.0 as your primary view, and the tool automatically calculates transitive cross-mappings to SOC 2, CIS v8, PCI DSS, NIS 2, NCSC CAF, and every other framework — through the shared ISO 27001 controls underneath. No separate lookup table required; the mappings are computed on the fly.
 
+**In-product disclaimer:** reverse views show a banner that these links are derived via ISO anchors and must not be over-trusted for audit-grade equivalence — always verify against official mappings.
+
 ### Full Hierarchy Views
 Every framework is rendered in its native hierarchy structure:
 - **NCSC CAF** — Objective → Principle → Contributing Outcome, with official Indicators of Good Practice (IGP) criteria per outcome
@@ -76,6 +78,9 @@ Each expanded control includes a pre-populated **Typical Evidence to Collect** c
 - Leave free-text notes in an Additional Notes field
 
 All evidence data is saved locally and included in Excel exports.
+
+### Assessment backup
+Use **Export assessment JSON** / **Import assessment JSON** in the sidebar to back up or restore scores, evidence checklists, and SoA justifications (the same data held in `localStorage`). Handy when switching browsers or sharing a personal assessment file with a colleague.
 
 ### Sidebar Filters
 Stackable filter pills across all frameworks. ISO 27001–specific filters include:
@@ -148,11 +153,11 @@ Excel exports additionally include:
 
 ## Deployment
 
-Single self-contained `grc_framework_mapping.html` file. No build step, no dependencies, no backend.
+Canonical entrypoint: **`index.html`** (GitHub Pages serves this from the repo root). Legacy `grc_framework_mapping.html` redirects to it. No build step, no backend.
 
-**GitHub Pages:** Upload to a public repo → Settings → Pages → Deploy from main branch
+**GitHub Pages:** Push to `main` → Settings → Pages → Deploy from main branch / root
 
-**Any web host:** Upload the single HTML file — works anywhere, even opened directly in a browser
+**Any web host:** Upload `index.html` — works anywhere, even opened directly in a browser
 
 ---
 
