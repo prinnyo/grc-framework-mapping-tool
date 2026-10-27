@@ -153,33 +153,38 @@ Excel exports additionally include:
 
 ## Deployment
 
-Canonical entrypoint: **`index.html`** (GitHub Pages serves this from the repo root). Legacy `grc_framework_mapping.html` redirects to it. No build step, no backend.
+Canonical entrypoint: **`index.html`** (GitHub Pages serves this from the repo root). Legacy `grc_framework_mapping.html` redirects to it. No build step, no backend, no npm install.
 
-**GitHub Pages:** Push to `main` → Settings → Pages → Deploy from main branch / root
+**Runtime note:** The UI loads React, ExcelJS, and web fonts from public CDNs when online. Opening the file offline still serves the embedded control catalog, but interactive React UI and Excel export need network access to those CDNs.
 
-**Any web host:** Upload `index.html` — works anywhere, even opened directly in a browser
+**GitHub Pages:** Push to `main` → Settings → Pages → Deploy from main branch / root · Live demo: https://prinnyo.github.io/grc-framework-mapping-tool/
+
+**Any web host:** Upload `index.html` — works anywhere with network access for the CDN scripts above
 
 ---
 
 ## Built With
 
-- React 18 (CDN, no build step)
+- React 18 (cdnjs UMD, no build step)
+- ExcelJS 4.4 (jsDelivr) for XLSX export
 - Vanilla CSS with CSS custom properties (dark/light theme)
-- DM Sans + JetBrains Mono typography
+- Hanken Grotesk + JetBrains Mono (Google Fonts)
 - localStorage for score, evidence, and justification persistence
-- All data embedded — no external API calls, no backend
+- All mapping data embedded — no app backend or assessment API
 
 ---
 
 ## Data Sources and Accuracy
 
-Control mappings, ISO 27002 descriptions, and implementation guidance are based on publicly available framework documentation and reflect commonly accepted alignments and best practices. Always verify mappings against the latest official framework publications for your specific compliance context. This tool does not constitute professional advice.
+Control mappings, ISO 27002-style statements, and implementation guidance are based on publicly available framework documentation and reflect commonly accepted alignments and best practices. Always verify mappings against the latest official framework publications for your specific compliance context. This tool does not constitute professional advice.
+
+**IP / licensing stance:** The MIT license covers this repository’s software (HTML/JS/CSS and tooling). Embedded control text and framework identifiers remain subject to their publishers’ terms (ISO, NIST, CIS, PCI SSC, NCSC, AICPA, etc.). Redistribute or commercialize those materials only as those terms allow; treat this atlas as a personal/prototype cross-reference aid, not a licensed copy of any standard.
 
 ---
 
 ## License
 
-MIT — free to use, modify, and share.
+MIT — free to use, modify, and share. See [`LICENSE`](./LICENSE).
 
 ---
 
