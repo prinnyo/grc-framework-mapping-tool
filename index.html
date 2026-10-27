@@ -7195,6 +7195,30 @@ var FW_TOTALS=(function(){
   return t;
 })();
 
+/* Honest catalog totals for the home hero mini-stats (not fake user progress). */
+var HOME_CATALOG=(function(){
+  var mapped=0;
+  Object.keys(FW_TOTALS).forEach(function(k){mapped+=FW_TOTALS[k];});
+  var shared=0;
+  CONTROLS.forEach(function(c){
+    var hits=0;
+    FRAMEWORKS.forEach(function(fw){
+      if(fw.id==="ISO 27001")return;
+      if(splitRefs(c[fw.prop]||"").length)hits++;
+    });
+    if(hits>=2)shared++;
+  });
+  var evidenceSuggested=0;
+  Object.keys(ISO_EVIDENCE).forEach(function(k){evidenceSuggested+=ISO_EVIDENCE[k].length;});
+  return {
+    mapped:mapped,
+    shared:shared,
+    evidenceSuggested:evidenceSuggested,
+    isoTotal:CONTROLS.length,
+    fwCount:FRAMEWORKS.length
+  };
+})();
+
 /* Mini SVG donut chart — rendered on home page framework cards */
 function DonutChart(p){
   var impl=p.impl||0,prog=p.prog||0,total=p.total||0;
@@ -7236,6 +7260,7 @@ var FW_BLURBS = {
 
 function HomePage(p){
   var allScores=p.allScores||{};
+  var allEvidence=p.allEvidence||{};
   var fwCards=p.frameworks.map(function(fw){
       var abbr=fw.id.split(" ")[0];
       if(abbr==="NIST"&&fw.id.indexOf("800")>-1)abbr="800";
@@ -7250,8 +7275,21 @@ function HomePage(p){
       var vals=Object.values(fwSc);
       var impl=vals.filter(function(v){return v==="implemented";}).length;
       var prog=vals.filter(function(v){return v==="progress";}).length;
-      return {id:fw.id,name:name,color:fw.color,abbr:abbr,impl:impl,prog:prog,total:FW_TOTALS[fw.id]||0};
+      var na=vals.filter(function(v){return v==="not_applicable";}).length;
+      return {id:fw.id,name:name,color:fw.color,abbr:abbr,impl:impl,prog:prog,na:na,total:FW_TOTALS[fw.id]||0};
     });
+  /* Live assessment counts — empty storage reads as zeros, not fake demo numbers. */
+  var evidenceCollected=0;
+  Object.keys(allEvidence).forEach(function(fw){
+    var items=allEvidence[fw]||{};
+    Object.keys(items).forEach(function(id){
+      var col=(items[id]&&items[id].collected)||{};
+      Object.keys(col).forEach(function(k){if(col[k])evidenceCollected++;});
+    });
+  });
+  var isoCard=fwCards.find(function(fw){return fw.id==="ISO 27001";})||{impl:0,prog:0,na:0,total:HOME_CATALOG.isoTotal};
+  var isoAssessed=isoCard.impl+isoCard.prog+isoCard.na;
+  var openGaps=Math.max(0,isoCard.total-isoCard.impl-isoCard.na);
   var features=[
     {icon:"🗺️",title:"Cross-framework mapping",body:"ISO 27001 is the spine. Every other framework is derived from it transitively — no manual lookup tables, no spreadsheets."},
     {icon:"📊",title:"Readiness scoring + SoA",body:"Score controls Not started, In progress, Implemented, or Not Applicable. ISO 27001 Annex A controls support a formal Statement of Applicability with per-control justification text."},
@@ -7266,13 +7304,16 @@ function HomePage(p){
     {n:"03",title:"Expand & score",body:"Open any control for its full description, cross-framework refs, evidence guidance, and achieved criteria. Mark Annex A controls as Not Applicable to build your SoA."},
     {n:"04",title:"Export & share",body:"Download a filtered CSV or Excel with all mappings and scores, or export a formal Statement of Applicability for all 93 Annex A controls."}
   ];
-  var bars=[
-    {fw:"ISO 27001",pct:84,w:"84%",color:"var(--brand)",delay:"0.1s"},
-    {fw:"NIST CSF",pct:71,w:"71%",color:"#F59E0B",delay:"0.2s"},
-    {fw:"SOC 2",pct:92,w:"92%",color:"#EF4444",delay:"0.3s"},
-    {fw:"PCI DSS",pct:58,w:"58%",color:"#DC6803",delay:"0.4s"},
-    {fw:"CIS v8",pct:77,w:"77%",color:"#10B981",delay:"0.5s"}
-  ];
+  /* Readiness bars from live scores (same weighting as donut charts). */
+  var bars=fwCards.slice(0,5).map(function(fw,i){
+    var short=fw.id==="ISO 27001"?"ISO 27001"
+      :fw.id==="NIST CSF 2.0"?"NIST CSF"
+      :fw.id==="Cyber Essentials"?"Cyber Ess."
+      :fw.id==="NIST 800-53"?"800-53"
+      :fw.id;
+    var pct=fw.total?Math.round(((fw.impl+fw.prog*0.5)/fw.total)*100):0;
+    return {fw:short,pct:pct,w:pct+"%",color:fw.color,delay:(0.1+i*0.1)+"s"};
+  });
   return e("div",{className:"home-page"},
 
     /* ── HERO ── */
@@ -7295,7 +7336,7 @@ function HomePage(p){
         ),
       ),
 
-      /* Right: compliance bars preview */
+      /* Right: live compliance overview (catalog + assessment — no fake demo numbers) */
       e("div",{className:"home-hero-preview"},
         e("div",{className:"home-preview-hdr"},
           e("span",{className:"preview-dot",style:{background:"#EF4444"}}),
@@ -7304,7 +7345,7 @@ function HomePage(p){
           e("span",{className:"home-preview-title"},"ctrlmap / compliance-overview")
         ),
         e("div",{className:"home-preview-body"},
-          e("div",{className:"home-preview-label"},"Framework readiness"),
+          e("div",{className:"home-preview-label"},"Your framework readiness"),
           bars.map(function(b){
             return e("div",{key:b.fw,className:"home-bar-row"},
               e("span",{className:"home-bar-fw"},b.fw),
@@ -7318,23 +7359,31 @@ function HomePage(p){
           e("div",{className:"home-mini-stats"},
             e("div",{className:"home-mini-stat"},
               e("div",{className:"home-mini-label"},"Controls mapped"),
-              e("div",{className:"home-mini-val",style:{color:"var(--brand)"}},"847"),
-              e("div",{className:"home-mini-sub"},"of 1,024 total")
+              e("div",{className:"home-mini-val",style:{color:"var(--brand)"}},String(HOME_CATALOG.mapped)),
+              e("div",{className:"home-mini-sub"},"across "+HOME_CATALOG.fwCount+" frameworks")
             ),
             e("div",{className:"home-mini-stat"},
               e("div",{className:"home-mini-label"},"Shared controls"),
-              e("div",{className:"home-mini-val",style:{color:"var(--info)"}},"189"),
-              e("div",{className:"home-mini-sub"},"cross-fw savings")
+              e("div",{className:"home-mini-val",style:{color:"var(--info)"}},String(HOME_CATALOG.shared)),
+              e("div",{className:"home-mini-sub"},"multi-framework ISO")
             ),
             e("div",{className:"home-mini-stat"},
               e("div",{className:"home-mini-label"},"Evidence items"),
-              e("div",{className:"home-mini-val",style:{color:"var(--success)"}},"312"),
-              e("div",{className:"home-mini-sub"},"artifacts tracked")
+              e("div",{className:"home-mini-val",style:{color:"var(--success)"}},String(evidenceCollected)),
+              e("div",{className:"home-mini-sub"},
+                evidenceCollected
+                  ?("of "+HOME_CATALOG.evidenceSuggested+" suggested")
+                  :"none logged yet"
+              )
             ),
             e("div",{className:"home-mini-stat"},
               e("div",{className:"home-mini-label"},"Open gaps"),
-              e("div",{className:"home-mini-val",style:{color:"var(--warning)"}},"43"),
-              e("div",{className:"home-mini-sub"},"needs attention")
+              e("div",{className:"home-mini-val",style:{color:"var(--warning)"}},String(openGaps)),
+              e("div",{className:"home-mini-sub"},
+                isoAssessed===0
+                  ?"not yet scored"
+                  :("of "+isoCard.total+" ISO controls")
+              )
             )
           )
         )
@@ -8539,7 +8588,7 @@ function App(){
       ),
       e("div",{className:"main-content"},
         primaryFw==="__home__"
-          ? e(HomePage,{onNavigate:function(fw){setPrimaryFw(fw);setExp(null)},frameworks:FRAMEWORKS,allScores:scores})
+          ? e(HomePage,{onNavigate:function(fw){setPrimaryFw(fw);setExp(null)},frameworks:FRAMEWORKS,allScores:scores,allEvidence:evidence})
           : e(React.Fragment,null,
               /* Page header */
               e("div",{style:{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:18,marginBottom:24,flexWrap:"wrap"}},
